@@ -1,7 +1,9 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Section } from "../primitives/Section";
 import { Container } from "../primitives/Container";
+import { Atmosphere } from "../cinema/Atmosphere";
+import { FilmReveal } from "../cinema/FilmReveal";
 import { beats } from "./beats";
 import { SkinCrossSection, Microchannels, LaserPulse, Exosomes, ClearSkin } from "./illustrations";
 
@@ -14,164 +16,101 @@ const IllusMap = {
 };
 
 /**
- * Mobile-first mechanism:
- * - Phone: full-width snap carousel — one beat per screen, swipe horizontally
- * - Tablet+: same carousel but wider cards
- * - Desktop (lg+): two-column with scroll-driven sticky illustration
+ * Cinematic mechanism — each "movement" is its own full-viewport chapter.
+ * Vertical scroll progresses through I → V. Each chapter has atmosphere,
+ * a large italic title, and the framed illustration centered with gold halo.
  */
 export function MechanismAnimation() {
   return (
-    <Section id="how-it-works" className="bg-surface-black relative overflow-hidden !py-16 md:!py-24">
-      <Container width="wide" className="relative">
-        <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-gold-500">How it works</p>
-        <h2 className="mt-3 font-display text-[clamp(2rem,8vw,3.5rem)] leading-[1.02] text-ivory-50">
-          Pigmentation doesn&apos;t live <em className="text-gold-400">on</em> your skin.
-          <br />It lives <em className="text-gold-400">in</em> it.
-        </h2>
-        <p className="mt-4 text-ivory-50/65 max-w-lg">
-          The five-step protocol, swipe through.
-        </p>
+    <section id="how-it-works" className="relative bg-surface-black">
+      {/* Intro chapter */}
+      <div className="relative min-h-[80dvh] flex items-center overflow-hidden">
+        <Atmosphere variant="spotlight-top" intensity={1.1} />
+        <Container width="wide" className="relative">
+          <FilmReveal>
+            <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-500">
+              <span className="inline-block w-6 h-px bg-gold-500 align-middle mr-3" />
+              The Protocol
+            </p>
+          </FilmReveal>
+          <FilmReveal delay={0.2}>
+            <h2 className="mt-6 font-display italic text-[clamp(2.5rem,10vw,5.5rem)] leading-[0.95] text-ivory-50 max-w-4xl">
+              Pigmentation doesn&apos;t live <span className="text-gold-400">on</span> your skin.
+              <br />It lives <span className="text-gold-400">in</span> it.
+            </h2>
+          </FilmReveal>
+          <FilmReveal delay={0.4}>
+            <p className="mt-8 text-base md:text-lg text-ivory-50/65 max-w-xl leading-relaxed">
+              Five movements. One protocol. Scroll through the mechanics — the same way Dr. Ahmad would walk you through them at consultation.
+            </p>
+          </FilmReveal>
+        </Container>
+      </div>
 
-        {/* Mobile + tablet: horizontal carousel. lg+: desktop layout */}
-        <div className="lg:hidden">
-          <MobileCarousel />
-        </div>
-        <div className="hidden lg:block">
-          <DesktopScroller />
-        </div>
-      </Container>
-    </Section>
+      {/* Five chapters */}
+      {beats.map((b, i) => {
+        const Illus = IllusMap[b.illustration];
+        const isEven = i % 2 === 0;
+        return <Chapter key={i} index={i} beat={b} Illus={Illus} isEven={isEven} />;
+      })}
+    </section>
   );
 }
 
-function MobileCarousel() {
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
-
-  // Track active beat via IntersectionObserver
-  useEffect(() => {
-    const root = scrollerRef.current;
-    if (!root) return;
-    const cards = root.querySelectorAll<HTMLDivElement>("[data-beat-card]");
-    const io = new IntersectionObserver((entries) => {
-      const top = entries.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (top) setActive(Number(top.target.getAttribute("data-idx") ?? 0));
-    }, { root, threshold: [0.55, 0.8] });
-    cards.forEach(c => io.observe(c));
-    return () => io.disconnect();
-  }, []);
-
+function Chapter({
+  index, beat, Illus, isEven,
+}: {
+  index: number;
+  beat: typeof beats[number];
+  Illus: () => React.ReactElement;
+  isEven: boolean;
+}) {
+  const reduced = useReducedMotion();
   return (
-    <>
-      <div
-        ref={scrollerRef}
-        className="mt-10 -mx-6 px-6 flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none pb-2"
-      >
-        {beats.map((b, i) => {
-          const Illus = IllusMap[b.illustration];
-          return (
-            <article
-              key={i}
-              data-beat-card
-              data-idx={i}
-              className="snap-start shrink-0 w-[88%] md:w-[60%]
-                         bg-surface-charcoal border border-gold-500/20 p-6 md:p-8
-                         flex flex-col"
-            >
-              <div className="flex items-baseline justify-between mb-6">
-                <span className="font-display italic text-gold-400 text-4xl leading-none">{b.numeral}</span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-gold-500/55">
-                  {b.numeral} of V
-                </span>
-              </div>
+    <div className="relative min-h-[100dvh] flex items-center overflow-hidden border-t border-gold-500/10">
+      <Atmosphere variant={index === 4 ? "halo" : "ambient"} intensity={0.8} />
 
-              <div className="w-full">
-                <Illus />
-              </div>
-
-              <h3 className="mt-8 font-display text-[clamp(1.5rem,5vw,2rem)] leading-tight text-ivory-50 italic">
-                {b.title}
+      <Container width="wide" className="relative py-20 md:py-0">
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center ${isEven ? "" : "md:[direction:rtl]"}`}>
+          {/* Copy column */}
+          <div className="md:[direction:ltr]">
+            <FilmReveal>
+              <span className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold-500/60">
+                Movement {beat.numeral} of V
+              </span>
+            </FilmReveal>
+            <FilmReveal delay={0.15}>
+              <p className="mt-5 font-display italic text-gold-400 text-[clamp(4rem,16vw,9rem)] leading-[0.85]">
+                {beat.numeral}
+              </p>
+            </FilmReveal>
+            <FilmReveal delay={0.3}>
+              <h3 className="mt-6 font-display italic text-[clamp(1.75rem,5vw,2.75rem)] leading-tight text-ivory-50 max-w-md">
+                {beat.title}
               </h3>
-              <p className="mt-3 text-ivory-50/70 leading-relaxed">{b.caption}</p>
-            </article>
-          );
-        })}
-      </div>
+            </FilmReveal>
+            <FilmReveal delay={0.45}>
+              <p className="mt-6 text-ivory-50/65 leading-relaxed max-w-md text-base md:text-lg">
+                {beat.caption}
+              </p>
+            </FilmReveal>
+          </div>
 
-      {/* Pagination dots */}
-      <div className="mt-6 flex items-center justify-center gap-2.5">
-        {beats.map((_, i) => (
-          <span
-            key={i}
-            className={`h-1 transition-all ${i === active ? "w-6 bg-gold-400" : "w-1 bg-gold-500/30"}`}
-            aria-hidden
-          />
-        ))}
-      </div>
-    </>
-  );
-}
-
-function DesktopScroller() {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let cleanup: (() => void) | undefined;
-    (async () => {
-      const { gsap } = await import("gsap");
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      gsap.registerPlugin(ScrollTrigger);
-      const root = containerRef.current;
-      if (!root) return;
-      const panels = root.querySelectorAll<HTMLDivElement>("[data-beat]");
-      const illos = root.querySelectorAll<HTMLDivElement>("[data-illus]");
-      const activate = (idx: number) => {
-        illos.forEach((el, j) => {
-          gsap.to(el, { autoAlpha: j === idx ? 1 : 0, duration: 0.55, ease: "power2.out" });
-        });
-      };
-      const triggers = Array.from(panels).map((p, i) =>
-        ScrollTrigger.create({
-          trigger: p, start: "top 60%", end: "bottom 40%",
-          onEnter: () => activate(i), onEnterBack: () => activate(i),
-        })
-      );
-      activate(0);
-      cleanup = () => triggers.forEach(t => t.kill());
-    })();
-    return () => cleanup?.();
-  }, []);
-
-  return (
-    <div ref={containerRef} className="mt-16 grid grid-cols-[40%_60%] gap-16 items-start">
-      <ol className="relative">
-        {beats.map((b, i) => (
-          <li key={i} data-beat className="min-h-[72vh] flex flex-col justify-center py-20">
-            <span className="font-display italic text-gold-400 text-3xl leading-none">{b.numeral}</span>
-            <h3 className="mt-5 font-display text-[clamp(1.75rem,2.6vw,2.5rem)] leading-tight text-ivory-50 italic max-w-md">
-              {b.title}
-            </h3>
-            <p className="mt-4 text-ivory-50/70 leading-relaxed max-w-md">{b.caption}</p>
-          </li>
-        ))}
-      </ol>
-      <div className="sticky top-24 h-[78vh]">
-        <div className="relative w-full h-full flex items-center justify-center">
-          <div className="relative w-full max-w-md">
-            {beats.map((b, i) => {
-              const Illus = IllusMap[b.illustration];
-              return (
-                <div key={i} data-illus style={{ opacity: i === 0 ? 1 : 0 }}
-                     className="absolute inset-0 flex items-center justify-center">
-                  <Illus />
-                </div>
-              );
-            })}
-            <div className="invisible"><SkinCrossSection /></div>
+          {/* Illustration column */}
+          <div className="md:[direction:ltr] relative">
+            <motion.div
+              initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.92, filter: "blur(12px)" }}
+              whileInView={reduced ? { opacity: 1 } : { opacity: 1, scale: 1, filter: "blur(0px)" }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+              className="relative flex justify-center"
+            >
+              <div aria-hidden className="absolute inset-0 bg-gradient-radial from-gold-500/15 via-transparent to-transparent blur-3xl" />
+              <Illus />
+            </motion.div>
           </div>
         </div>
-      </div>
+      </Container>
     </div>
   );
 }
