@@ -2,43 +2,33 @@ export interface Beat {
   numeral: string;
   title: string;
   caption: string;
-  illustration: "skin-cross-section" | "microchannels" | "laser-pulse" | "exosomes" | "clear-skin";
+  illustration: "cream-stops" | "laser-reaches" | "body-clears";
 }
 
+/**
+ * Three plain-English steps. Anyone — your mother, your neighbour, a 14-year-old —
+ * should "get" this without re-reading.
+ */
 export const beats: Beat[] = [
   {
-    numeral: "I",
-    title: "The pigment lives below.",
+    numeral: "01",
+    title: "Why creams aren't working.",
     caption:
-      "Topical creams reach only the upper 0.2mm. Pigmentation forms 2–2.4mm deeper, in the dermal layer.",
-    illustration: "skin-cross-section",
+      "Your pigmentation lives about 2mm under your skin. Creams only reach the top 0.2mm. That's why they plateau, no matter how expensive.",
+    illustration: "cream-stops",
   },
   {
-    numeral: "II",
-    title: "We open a precise aperture.",
+    numeral: "02",
+    title: "We treat where it actually lives.",
     caption:
-      "VirtueRF descends 9 microchannels at 250 microns — opening access without thermal trauma to the surrounding tissue.",
-    illustration: "microchannels",
+      "A medical laser passes harmlessly through the surface and breaks up the deep pigment into tiny pieces — without damaging the skin around it.",
+    illustration: "laser-reaches",
   },
   {
-    numeral: "III",
-    title: "A pulse fragments the pigment.",
+    numeral: "03",
+    title: "Your body clears it naturally.",
     caption:
-      "A 750-picosecond pulse shatters melanin clusters into particles small enough for the body to clear, without raising tissue temperature.",
-    illustration: "laser-pulse",
-  },
-  {
-    numeral: "IV",
-    title: "Repair is infused into the channels.",
-    caption:
-      "Growth factors, Vitamin-C and tranexamic acid are delivered straight to the treatment depth — accelerating clearance and silencing re-pigmentation triggers.",
-    illustration: "exosomes",
-  },
-  {
-    numeral: "V",
-    title: "Clearance holds.",
-    caption:
-      "Most patients reach ~90% clearance by week 12. With SPF discipline and a quarterly maintenance peel, results compound.",
-    illustration: "clear-skin",
+      "Over the next few weeks your lymphatic system removes the broken-up pigment. Four to six sessions, three weeks apart, and the result holds.",
+    illustration: "body-clears",
   },
 ];

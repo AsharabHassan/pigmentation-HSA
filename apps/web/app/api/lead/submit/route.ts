@@ -1,4 +1,3 @@
-import { kv } from "@vercel/kv";
 import { leadSchema } from "@lib/validation/lead-schema";
 import { normalizePhone } from "@lib/validation/phone";
 import { hasMxRecord } from "@lib/validation/email-mx";
@@ -21,6 +20,21 @@ const sessionsMap: Record<string, string> = {
   "lip-pigment": "3-4 over 8 weeks", "underarm": "4-6 over 12 weeks",
   "not-sure": "TBD at consultation",
 };
+
+/** Lazy KV — only loaded when env is actually configured; otherwise no-op. */
+async function queueFailedLead(payload: unknown) {
+  if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+    console.warn("[lead] KV not configured — skipping failed-lead queue");
+    return;
+  }
+  try {
+    const { kv } = await import("@vercel/kv");
+    const id = crypto.randomUUID();
+    await kv.set(`leads:failed:${id}`, JSON.stringify(payload), { ex: 60 * 60 * 24 * 7 });
+  } catch (e) {
+    console.warn("[lead] KV queue failed", e);
+  }
+}
 
 export async function POST(req: Request): Promise<Response> {
   let raw: Record<string, unknown>;
@@ -52,13 +66,16 @@ export async function POST(req: Request): Promise<Response> {
   const tag = leadTag(score);
   const contact = buildGhlContact(lead, "Pigmentation LP — Glasgow", tag, score);
 
-  const result = await ghlUpsertContact(contact);
-
-  if (!result.ok) {
-    const id = crypto.randomUUID();
-    await kv.set(`leads:failed:${id}`, JSON.stringify({
-      contact, lead, attempts: 1, firstAttempt: Date.now(),
-    }), { ex: 60 * 60 * 24 * 7 });
+  // GHL is optional in dev — if no key, log + continue so the UI flow works
+  let ghlOk = true;
+  if (process.env.GHL_API_KEY && process.env.GHL_LOCATION_ID) {
+    const result = await ghlUpsertContact(contact);
+    ghlOk = result.ok;
+    if (!result.ok) {
+      await queueFailedLead({ contact, lead, attempts: 1, firstAttempt: Date.now() });
+    }
+  } else {
+    console.warn("[lead] GHL not configured — skipping upsert. Contact:", contact.email);
   }
 
   const eventId = (raw.eventId as string) ?? crypto.randomUUID();
@@ -66,6 +83,7 @@ export async function POST(req: Request): Promise<Response> {
   return json(200, {
     ok: true,
     eventId,
+    ghlSent: ghlOk,
     reveal: {
       firstName: contact.firstName,
       concern: lead.quiz?.primary_concern ?? null,

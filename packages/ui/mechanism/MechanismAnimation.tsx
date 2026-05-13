@@ -1,116 +1,91 @@
 "use client";
-import { motion, useReducedMotion } from "framer-motion";
-import { Section } from "../primitives/Section";
+import { motion } from "framer-motion";
 import { Container } from "../primitives/Container";
-import { Atmosphere } from "../cinema/Atmosphere";
-import { FilmReveal } from "../cinema/FilmReveal";
 import { beats } from "./beats";
-import { SkinCrossSection, Microchannels, LaserPulse, Exosomes, ClearSkin } from "./illustrations";
+import { StepCreamStops, StepLaserReaches, StepBodyClears } from "./illustrations";
 
 const IllusMap = {
-  "skin-cross-section": SkinCrossSection,
-  "microchannels": Microchannels,
-  "laser-pulse": LaserPulse,
-  "exosomes": Exosomes,
-  "clear-skin": ClearSkin,
+  "cream-stops":   StepCreamStops,
+  "laser-reaches": StepLaserReaches,
+  "body-clears":   StepBodyClears,
 };
 
-/**
- * Cinematic mechanism — each "movement" is its own full-viewport chapter.
- * Vertical scroll progresses through I → V. Each chapter has atmosphere,
- * a large italic title, and the framed illustration centered with gold halo.
- */
 export function MechanismAnimation() {
   return (
-    <section id="how-it-works" className="relative bg-surface-black">
-      {/* Intro chapter */}
-      <div className="relative min-h-[80dvh] flex items-center overflow-hidden">
-        <Atmosphere variant="spotlight-top" intensity={1.1} />
-        <Container width="wide" className="relative">
-          <FilmReveal>
-            <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-500">
-              <span className="inline-block w-6 h-px bg-gold-500 align-middle mr-3" />
-              The Protocol
-            </p>
-          </FilmReveal>
-          <FilmReveal delay={0.2}>
-            <h2 className="mt-6 font-display italic text-[clamp(2.5rem,10vw,5.5rem)] leading-[0.95] text-ivory-50 max-w-4xl">
-              Pigmentation doesn&apos;t live <span className="text-gold-400">on</span> your skin.
-              <br />It lives <span className="text-gold-400">in</span> it.
-            </h2>
-          </FilmReveal>
-          <FilmReveal delay={0.4}>
-            <p className="mt-8 text-base md:text-lg text-ivory-50/65 max-w-xl leading-relaxed">
-              Five movements. One protocol. Scroll through the mechanics — the same way Dr. Ahmad would walk you through them at consultation.
-            </p>
-          </FilmReveal>
-        </Container>
-      </div>
+    <section id="how-it-works" className="relative bg-surface-black overflow-hidden border-t border-gold-500/15">
+      <Container width="wide" className="relative pt-20 md:pt-28 pb-20 md:pb-28">
+        <div className="flex items-baseline justify-between gap-4 mb-3">
+          <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold-500/70">
+            Ch. III · How it works
+          </p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold-500/35 tabular-nums">
+            3 steps · plain English
+          </p>
+        </div>
+        <span aria-hidden className="block h-px bg-gold-500/15" />
 
-      {/* Five chapters */}
-      {beats.map((b, i) => {
-        const Illus = IllusMap[b.illustration];
-        const isEven = i % 2 === 0;
-        return <Chapter key={i} index={i} beat={b} Illus={Illus} isEven={isEven} />;
-      })}
+        <motion.h2
+          initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-10 font-display italic text-[clamp(2.5rem,11vw,7rem)] leading-[0.9] text-ivory-50 max-w-5xl"
+        >
+          What we do,<br />
+          <span className="text-gold-400">in three steps.</span>
+        </motion.h2>
+
+        <p className="mt-6 text-base md:text-lg text-ivory-50/65 max-w-2xl leading-relaxed">
+          Most people don&apos;t need the science. Here&apos;s the plain version.
+        </p>
+
+        <div className="mt-16 md:mt-20 flex flex-col gap-24 md:gap-32">
+          {beats.map((b, i) => {
+            const Illus = IllusMap[b.illustration];
+            return <Step key={i} beat={b} Illus={Illus} reverse={i % 2 === 1} />;
+          })}
+        </div>
+      </Container>
     </section>
   );
 }
 
-function Chapter({
-  index, beat, Illus, isEven,
+function Step({
+  beat, Illus, reverse,
 }: {
-  index: number;
   beat: typeof beats[number];
   Illus: () => React.ReactElement;
-  isEven: boolean;
+  reverse: boolean;
 }) {
-  const reduced = useReducedMotion();
   return (
-    <div className="relative min-h-[100dvh] flex items-center overflow-hidden border-t border-gold-500/10">
-      <Atmosphere variant={index === 4 ? "halo" : "ambient"} intensity={0.8} />
+    <motion.div
+      initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      className={`grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center ${reverse ? "md:[direction:rtl]" : ""}`}
+    >
+      <div className="md:[direction:ltr]">
+        <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold-500/55">
+          Step {beat.numeral} of 03
+        </p>
+        <p className="mt-3 font-display italic text-gold-400 text-[clamp(4rem,18vw,10rem)] leading-[0.85] tabular-nums">
+          {beat.numeral}
+        </p>
+        <h3 className="mt-4 font-display italic text-[clamp(1.75rem,6vw,3rem)] leading-[1.02] text-ivory-50 max-w-md">
+          {beat.title}
+        </h3>
+        <p className="mt-5 text-ivory-50/70 leading-relaxed max-w-md text-base md:text-lg">
+          {beat.caption}
+        </p>
+      </div>
 
-      <Container width="wide" className="relative py-20 md:py-0">
-        <div className={`grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center ${isEven ? "" : "md:[direction:rtl]"}`}>
-          {/* Copy column */}
-          <div className="md:[direction:ltr]">
-            <FilmReveal>
-              <span className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold-500/60">
-                Movement {beat.numeral} of V
-              </span>
-            </FilmReveal>
-            <FilmReveal delay={0.15}>
-              <p className="mt-5 font-display italic text-gold-400 text-[clamp(4rem,16vw,9rem)] leading-[0.85]">
-                {beat.numeral}
-              </p>
-            </FilmReveal>
-            <FilmReveal delay={0.3}>
-              <h3 className="mt-6 font-display italic text-[clamp(1.75rem,5vw,2.75rem)] leading-tight text-ivory-50 max-w-md">
-                {beat.title}
-              </h3>
-            </FilmReveal>
-            <FilmReveal delay={0.45}>
-              <p className="mt-6 text-ivory-50/65 leading-relaxed max-w-md text-base md:text-lg">
-                {beat.caption}
-              </p>
-            </FilmReveal>
-          </div>
-
-          {/* Illustration column */}
-          <div className="md:[direction:ltr] relative">
-            <motion.div
-              initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.92, filter: "blur(12px)" }}
-              whileInView={reduced ? { opacity: 1 } : { opacity: 1, scale: 1, filter: "blur(0px)" }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-              className="relative flex justify-center"
-            >
-              <div aria-hidden className="absolute inset-0 bg-gradient-radial from-gold-500/15 via-transparent to-transparent blur-3xl" />
-              <Illus />
-            </motion.div>
-          </div>
+      <div className="md:[direction:ltr] relative">
+        <div aria-hidden className="absolute -inset-4 bg-gradient-to-br from-gold-500/12 to-transparent blur-2xl pointer-events-none" />
+        <div className="relative flex justify-center md:justify-end">
+          <Illus />
         </div>
-      </Container>
-    </div>
+      </div>
+    </motion.div>
   );
 }
