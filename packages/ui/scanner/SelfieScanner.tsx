@@ -59,8 +59,10 @@ export function SelfieScanner() {
     setError(null);
 
     try {
-      const base64 = await fileToBase64(fileRef.current);
-      const mediaType = (fileRef.current.type || "image/jpeg") as "image/jpeg" | "image/png" | "image/webp";
+      // Phone selfies are typically 3-15MB raw — downscale to 1024px on the
+      // long edge and re-encode as JPEG so the request body stays well under
+      // the server limit. The Claude analysis doesn't need more pixels than this.
+      const { base64, mediaType } = await downscaleAndEncode(fileRef.current, 1024, 0.82);
 
       // Min animation time so the scan feels deliberate
       const [res] = await Promise.all([
@@ -72,6 +74,10 @@ export function SelfieScanner() {
         new Promise(r => setTimeout(r, 2200)),
       ]);
 
+      if (!res.ok) {
+        throw new Error(`Server error ${res.status}`);
+      }
+
       const data = (await res.json()) as { ok: boolean; analysis?: SkinAnalysis; error?: string };
       if (!data.ok || !data.analysis) {
         throw new Error(data.error || "Analysis failed");
@@ -79,7 +85,7 @@ export function SelfieScanner() {
       setAnalysis(data.analysis);
       setPhase("revealed");
     } catch (e) {
-      console.error(e);
+      console.error("[scanner]", e);
       setError(e instanceof Error ? e.message : "Analysis failed");
       setPhase("error");
     }
@@ -361,14 +367,70 @@ function DataRow({ k, v }: { k: string; v: string }) {
   );
 }
 
-async function fileToBase64(file: File): Promise<string> {
-  const buf = await file.arrayBuffer();
+/**
+ * Downscale a user-selected image to `maxSide` px on the long edge and
+ * re-encode as JPEG. Keeps the upload small enough for the API body limit
+ * and reduces tokens spent on the Claude vision call.
+ */
+async function downscaleAndEncode(
+  file: File,
+  maxSide: number,
+  jpegQuality: number,
+): Promise<{ base64: string; mediaType: "image/jpeg" }> {
+  const bitmap = await loadBitmap(file);
+  const ratio = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+  const w = Math.round(bitmap.width * ratio);
+  const h = Math.round(bitmap.height * ratio);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Browser canvas unavailable");
+  ctx.drawImage(bitmap, 0, 0, w, h);
+
+  const blob: Blob = await new Promise((resolve, reject) => {
+    canvas.toBlob(
+      b => (b ? resolve(b) : reject(new Error("Could not encode image"))),
+      "image/jpeg",
+      jpegQuality,
+    );
+  });
+  const base64 = await blobToBase64(blob);
+  return { base64, mediaType: "image/jpeg" };
+}
+
+async function loadBitmap(file: File): Promise<ImageBitmap | HTMLImageElement> {
+  if (typeof createImageBitmap === "function") {
+    try {
+      return await createImageBitmap(file);
+    } catch {
+      // fall through to HTMLImageElement fallback
+    }
+  }
+  // Fallback for browsers without createImageBitmap (rare)
+  const url = URL.createObjectURL(file);
+  try {
+    return await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Could not load image"));
+      img.src = url;
+    });
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+async function blobToBase64(blob: Blob): Promise<string> {
+  const buf = await blob.arrayBuffer();
   const bytes = new Uint8Array(buf);
-  // Build base64 in chunks to avoid stack overflow on large files
   let binary = "";
   const chunkSize = 0x8000;
   for (let i = 0; i < bytes.length; i += chunkSize) {
     binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
   }
-  return typeof btoa !== "undefined" ? btoa(binary) : Buffer.from(binary, "binary").toString("base64");
+  return typeof btoa !== "undefined"
+    ? btoa(binary)
+    : Buffer.from(binary, "binary").toString("base64");
 }
