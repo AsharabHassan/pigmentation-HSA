@@ -2,8 +2,6 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Container } from "../primitives/Container";
-import { Atmosphere } from "../cinema/Atmosphere";
-import { FilmReveal } from "../cinema/FilmReveal";
 
 interface Props {
   name: string;
@@ -16,61 +14,70 @@ interface Props {
 
 export function DoctorSection(p: Props) {
   return (
-    <section id="doctor" className="relative min-h-[100dvh] flex items-center bg-surface-black overflow-hidden border-y border-gold-500/15">
-      <Atmosphere variant="spotlight-corner" intensity={0.9} />
-
-      <Container width="wide" className="relative grid grid-cols-1 md:grid-cols-[45%_55%] gap-12 md:gap-16 items-center py-20 md:py-0">
+    <section id="doctor" className="bg-surface-100 py-20 md:py-28">
+      <Container width="wide" className="grid grid-cols-1 md:grid-cols-[42%_58%] gap-10 md:gap-16 items-center">
         <motion.div
-          initial={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
-          whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-          className="relative aspect-[4/5] w-full max-w-[440px] mx-auto md:max-w-none"
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+          className="relative"
         >
-          <div aria-hidden className="absolute -inset-4 bg-gradient-to-br from-gold-500/25 to-transparent blur-2xl" />
-          <div className="relative w-full h-full ring-1 ring-gold-500/40 bg-surface-charcoal overflow-hidden">
+          <div aria-hidden className="absolute -inset-3 bg-clay-100/50 rounded-3xl -rotate-1" />
+          <div className="relative aspect-[4/5] rounded-2xl overflow-hidden ring-1 ring-surface-200">
             <Image
               src={p.portrait} alt={p.portraitAlt} fill
-              sizes="(max-width: 768px) 90vw, 45vw"
+              sizes="(max-width: 768px) 90vw, 42vw"
               className="object-cover"
             />
-            <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
-            <div className="absolute bottom-0 inset-x-0 p-6 md:p-8 z-10">
-              <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold-400/80">
-                Clinical Director
-              </p>
-              <p className="mt-1 font-display italic text-2xl md:text-3xl text-ivory-50">
-                {p.name}
-              </p>
-            </div>
           </div>
         </motion.div>
 
         <div>
-          <FilmReveal>
-            <p className="text-[11px] font-medium uppercase tracking-[0.32em] text-gold-500">
-              <span className="inline-block w-6 h-px bg-gold-500 align-middle mr-3" />
-              The Doctor
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-[11px] uppercase tracking-[0.18em] text-clay-500 font-semibold"
+          >
+            The doctor behind the protocol
+          </motion.p>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="mt-4 font-display text-4xl md:text-6xl text-ink-900 leading-[1.05]"
+          >
+            Hi — I&apos;m <span className="text-clay-600">{p.name.replace("Dr. ", "")}</span>.
+          </motion.h2>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.25 }}
+            className="mt-6 space-y-4 text-ink-700 leading-relaxed max-w-xl"
+          >
+            <p>
+              {p.yearsOfPractice}+ years in aesthetic medicine. I built this protocol because the patients who came to me had usually tried everything — creams, peels, IPL elsewhere — and were tired of being told their pigmentation was &ldquo;just hereditary&rdquo;.
             </p>
-          </FilmReveal>
+            <p className="font-display italic text-xl md:text-2xl text-ink-900 leading-snug">
+              &ldquo;{p.philosophy}&rdquo;
+            </p>
+          </motion.div>
 
-          <FilmReveal delay={0.15}>
-            <h2 className="mt-6 font-display italic text-[clamp(2.25rem,7vw,4rem)] leading-[0.95] text-ivory-50">
-              {p.yearsOfPractice}+ years.<br/>
-              <span className="text-gold-400">One protocol, refined.</span>
-            </h2>
-          </FilmReveal>
-
-          <FilmReveal delay={0.3}>
-            <p className="mt-5 text-gold-500 text-[11px] uppercase tracking-[0.22em]">{p.credentials}</p>
-          </FilmReveal>
-
-          <FilmReveal delay={0.45}>
-            <blockquote className="mt-10 font-display italic text-[clamp(1.5rem,3.5vw,2.25rem)] leading-snug text-ivory-50/90 relative">
-              <span aria-hidden className="absolute -left-3 -top-4 text-gold-400/40 text-5xl font-display italic">&ldquo;</span>
-              {p.philosophy}
-            </blockquote>
-          </FilmReveal>
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-500"
+          >
+            <span className="text-moss-700 font-medium">{p.credentials}</span>
+          </motion.div>
         </div>
       </Container>
     </section>

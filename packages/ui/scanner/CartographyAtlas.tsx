@@ -61,39 +61,33 @@ export function CartographyAtlas({
     >
       <defs>
         <radialGradient id="atlas-bg" cx="50%" cy="42%" r="62%">
-          <stop offset="0%"  stopColor={`hsl(40 30% ${luminance + 4}%)`} stopOpacity="0.25" />
-          <stop offset="55%" stopColor="#0F0F0F" stopOpacity="0.7" />
-          <stop offset="100%" stopColor="#000" stopOpacity="1" />
+          <stop offset="0%"  stopColor="#FAF6EE" stopOpacity="1" />
+          <stop offset="55%" stopColor="#F2EBDD" stopOpacity="1" />
+          <stop offset="100%" stopColor="#E5DAC4" stopOpacity="1" />
         </radialGradient>
 
         <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#C9A65C" strokeOpacity="0.05" strokeWidth="0.5" />
+          <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#B85A3C" strokeOpacity="0.08" strokeWidth="0.5" />
         </pattern>
 
         <pattern id="dense-grid" width="80" height="80" patternUnits="userSpaceOnUse">
-          <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#C9A65C" strokeOpacity="0.12" strokeWidth="0.5" />
+          <path d="M 80 0 L 0 0 0 80" fill="none" stroke="#B85A3C" strokeOpacity="0.15" strokeWidth="0.5" />
         </pattern>
 
-        <filter id="grain">
-          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" />
-          <feColorMatrix values="0 0 0 0 0.79  0 0 0 0 0.65  0 0 0 0 0.36  0 0 0 0.08 0" />
-        </filter>
-
         <radialGradient id="cluster" cx="50%" cy="50%" r="50%">
-          <stop offset="0%"  stopColor="#E6CB8F" stopOpacity="0.9" />
-          <stop offset="40%" stopColor="#C9A65C" stopOpacity="0.55" />
-          <stop offset="100%" stopColor="#C9A65C" stopOpacity="0" />
+          <stop offset="0%"  stopColor="#B85A3C" stopOpacity="0.85" />
+          <stop offset="50%" stopColor="#B85A3C" stopOpacity="0.4" />
+          <stop offset="100%" stopColor="#B85A3C" stopOpacity="0" />
         </radialGradient>
       </defs>
 
-      <rect width="400" height="500" fill="#000" />
+      <rect width="400" height="500" fill="#FAF6EE" />
       <rect width="400" height="500" fill="url(#atlas-bg)" />
       <rect width="400" height="500" fill="url(#grid)" />
       <rect width="400" height="500" fill="url(#dense-grid)" />
-      <rect width="400" height="500" fill="url(#grain)" opacity="0.4" />
 
       {/* Stylised facial region map — never a likeness */}
-      <g stroke="#C9A65C" fill="none" strokeWidth="0.6" opacity="0.35">
+      <g stroke="#B85A3C" fill="none" strokeWidth="0.6" opacity="0.35">
         <ellipse cx="200" cy="240" rx="125" ry="170" />
         <ellipse cx="200" cy="240" rx="105" ry="148" />
         <ellipse cx="200" cy="240" rx="82" ry="120" />
@@ -108,7 +102,7 @@ export function CartographyAtlas({
       </g>
 
       {/* Region survey labels */}
-      <g stroke="#C9A65C" strokeOpacity="0.35" strokeWidth="0.5" fill="#C9A65C" fillOpacity="0.7"
+      <g stroke="#B85A3C" strokeOpacity="0.35" strokeWidth="0.5" fill="#B85A3C" fillOpacity="0.7"
          fontFamily="DM Mono, monospace" fontSize="7" letterSpacing="1.5">
         <line x1="60" y1="170" x2="115" y2="195" />
         <text x="20" y="172">L. ORBITAL</text>
@@ -140,7 +134,7 @@ export function CartographyAtlas({
             />
             {!preview && !blurred && (
               <text x={z.x + z.r + 3} y={z.y + 2}
-                    fill="#C9A65C" fillOpacity="0.7"
+                    fill="#B85A3C" fillOpacity="0.7"
                     fontFamily="DM Mono, monospace" fontSize="6">
                 {String(i + 1).padStart(2, "0")}
               </text>
@@ -152,7 +146,7 @@ export function CartographyAtlas({
       {/* Scan sweep */}
       {scanning && (
         <g>
-          <line x1="0" y1="0" x2="400" y2="0" stroke="#C9A65C" strokeWidth="1" opacity="0.9">
+          <line x1="0" y1="0" x2="400" y2="0" stroke="#B85A3C" strokeWidth="1" opacity="0.9">
             <animate attributeName="y1" from="0" to="500" dur="2.5s" fill="freeze" />
             <animate attributeName="y2" from="0" to="500" dur="2.5s" fill="freeze" />
           </line>

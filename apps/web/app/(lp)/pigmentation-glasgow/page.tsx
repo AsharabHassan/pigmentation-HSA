@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Hero } from "@ui/hero/Hero";
+import { TrustStrip } from "@ui/sections/TrustStrip";
 import { ConcernCards } from "@ui/sections/ConcernCards";
 import { DoctorSection } from "@ui/sections/DoctorSection";
 import { Testimonials } from "@ui/sections/Testimonials";
@@ -36,6 +37,7 @@ export default function PigmentationLpPage() {
   return (
     <>
       <Hero {...hero} />
+      <TrustStrip />
       <ConcernCards />
       <ClientSelfieScanner />
       <ClientMechanismAnimation />
@@ -45,7 +47,7 @@ export default function PigmentationLpPage() {
       <PricingCards />
       <ClientBookingSection />
       <FAQ
-        heading="Frequently asked — pigmentation treatment in Glasgow"
+        heading="Frequently asked"
         entries={faqOnPage}
         id="faq"
       />

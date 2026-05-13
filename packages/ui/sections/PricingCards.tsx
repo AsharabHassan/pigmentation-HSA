@@ -1,130 +1,114 @@
 "use client";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Check } from "lucide-react";
 import { Container } from "../primitives/Container";
 
 const tiers = [
   {
-    code: "00",
-    name: "Skin Consultation",
+    name: "Free consultation",
     price: "£0",
-    cadence: "60 minutes",
-    features: ["Dermatological analysis", "Personalised plan", "Pricing breakdown — zero pressure"],
+    cadence: "60 minutes · online",
+    features: [
+      "Dermatological skin analysis",
+      "Personalised treatment plan",
+      "Transparent pricing breakdown",
+      "Zero pressure to book",
+    ],
     cta: { label: "Book consultation", href: "#book" },
     featured: false,
   },
   {
-    code: "01",
     name: "Signature 3-Step Protocol",
-    price: "£399",
+    price: "From £399",
     cadence: "per session · 4–6 typical",
-    features: ["VirtueRF microchanneling", "Pulsed-laser pigment fragmentation", "Exosome + mesotherapy infusion", "Calibrated for Fitzpatrick I–VI"],
+    features: [
+      "VirtueRF microchanneling",
+      "Pulsed-laser pigment fragmentation",
+      "Exosome + mesotherapy infusion",
+      "Calibrated for Fitzpatrick I–VI",
+    ],
     cta: { label: "Book consultation", href: "#book" },
     featured: true,
   },
   {
-    code: "02",
-    name: "Maintenance Clarity Peel",
-    price: "£149",
+    name: "Maintenance Peel",
+    price: "From £149",
     cadence: "per peel · 6–12 weekly",
-    features: ["Medical-grade chemical peel", "Same-day, no downtime", "Pairs with primary protocol"],
+    features: [
+      "Medical-grade chemical peel",
+      "Same-day, no downtime",
+      "Pairs with the primary protocol",
+    ],
     cta: { label: "Add to plan", href: "#book" },
     featured: false,
   },
 ];
 
-/**
- * Pricing as a spec catalogue. Each tier is a numbered entry, mono code,
- * data-plate readout. Featured tier has elevated typography but stays
- * editorial — no halo glow, no clichéd "popular" bubble.
- */
 export function PricingCards() {
   return (
-    <section id="pricing" className="relative bg-surface-charcoal overflow-hidden border-t border-gold-500/15">
-      <Container width="wide" className="relative pt-20 md:pt-28 pb-20 md:pb-28">
-        <div className="flex items-baseline justify-between gap-4 mb-3">
-          <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold-500/70">
-            Ch. VII · Investment
+    <section id="pricing" className="bg-surface-100 py-20 md:py-28">
+      <Container width="wide">
+        <div className="text-center mb-12 md:mb-16 max-w-2xl mx-auto">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-clay-500 font-semibold mb-3">
+            Pricing
           </p>
-          <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold-500/35 tabular-nums">
-            03 tiers · pricing in GBP
+          <h2 className="font-display text-4xl md:text-6xl text-ink-900 leading-[1.05]">
+            No hidden fees.
+          </h2>
+          <p className="mt-5 text-base md:text-lg text-ink-700">
+            Klarna and split-payment available. Final pricing confirmed at your free consultation.
           </p>
         </div>
-        <span aria-hidden className="block h-px bg-gold-500/15" />
 
-        <motion.h2
-          initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
-          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-10 font-display italic text-[clamp(2.5rem,11vw,7rem)] leading-[0.9] text-ivory-50 max-w-5xl"
-        >
-          Transparent.<br />
-          <span className="text-gold-400">No hidden fees.</span>
-        </motion.h2>
-
-        <p className="mt-6 text-base md:text-lg text-ivory-50/65 max-w-xl">
-          Klarna and split-payment available. Final pricing confirmed at your free consultation.
-        </p>
-
-        <div className="mt-14 md:mt-20 grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 max-w-5xl mx-auto">
           {tiers.map((t, i) => (
             <motion.article
-              key={t.code}
-              initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              key={t.name}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.9, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
               className={
                 t.featured
-                  ? "relative bg-surface-black border border-gold-500 md:col-span-6 p-8 md:p-12 order-first md:order-none"
-                  : "relative bg-surface-black border border-gold-500/20 md:col-span-3 p-7 md:p-8"
+                  ? "relative bg-ink-900 text-surface-50 rounded-2xl p-8 md:p-10 order-first md:order-none md:scale-[1.04] shadow-[0_20px_60px_-20px_rgba(26,22,18,0.3)]"
+                  : "relative bg-surface-50 rounded-2xl p-8 md:p-10 border border-surface-200"
               }
             >
-              {/* Catalogue code */}
-              <div className="flex items-baseline justify-between mb-5">
-                <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold-500/60 tabular-nums">
-                  Ref. № {t.code}
-                </p>
-                {t.featured && (
-                  <p className="font-mono text-[9px] uppercase tracking-[0.32em] text-gold-400">
-                    ◆ Most chosen
-                  </p>
-                )}
-              </div>
-
-              <h3 className="font-display italic text-2xl md:text-3xl text-ivory-50">
+              {t.featured && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-clay-500 text-surface-50
+                                 text-[10px] uppercase tracking-[0.18em] font-semibold
+                                 px-4 py-1.5 rounded-full">
+                  Most chosen
+                </span>
+              )}
+              <h3 className={`font-display text-2xl md:text-3xl ${t.featured ? "text-surface-50" : "text-ink-900"}`}>
                 {t.name}
               </h3>
-
-              <div className="mt-7 flex items-baseline gap-3">
-                <p className={`font-display italic leading-none tabular-nums ${t.featured ? "text-gold-400 text-6xl md:text-7xl" : "text-ivory-50 text-5xl"}`}>
-                  {t.price}
-                </p>
-                <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-gold-500/60">
-                  {t.cadence}
-                </p>
-              </div>
-
-              <ul className="mt-8 space-y-2.5 text-sm text-ivory-50/75">
+              <p className={`mt-5 font-display ${t.featured ? "text-clay-300" : "text-ink-900"} text-4xl md:text-5xl tabular-nums`}>
+                {t.price}
+              </p>
+              <p className={`text-sm mt-1 ${t.featured ? "text-surface-50/60" : "text-ink-500"}`}>
+                {t.cadence}
+              </p>
+              <ul className={`mt-7 space-y-2.5 text-sm ${t.featured ? "text-surface-50/85" : "text-ink-700"}`}>
                 {t.features.map(f => (
-                  <li key={f} className="flex gap-3">
-                    <span aria-hidden className="text-gold-500 mt-1">·</span>
+                  <li key={f} className="flex gap-2.5">
+                    <Check size={16} className={`shrink-0 mt-0.5 ${t.featured ? "text-clay-300" : "text-clay-500"}`} aria-hidden />
                     <span>{f}</span>
                   </li>
                 ))}
               </ul>
-
               <Link
                 href={t.cta.href as never}
-                className={`mt-10 inline-flex items-center justify-between w-full px-6 py-4 text-[11px] uppercase tracking-[0.24em] font-semibold transition-colors ${
+                className={`mt-8 inline-flex items-center justify-center w-full px-6 py-3.5
+                            text-[12px] uppercase tracking-[0.12em] font-semibold rounded-full transition-colors ${
                   t.featured
-                    ? "bg-gold-500 text-ink-900 hover:bg-gold-400"
-                    : "border border-gold-500/40 text-ivory-50 hover:bg-gold-500 hover:text-ink-900 hover:border-gold-500"
+                    ? "bg-clay-500 text-surface-50 hover:bg-clay-600"
+                    : "bg-ink-900 text-surface-50 hover:bg-ink-700"
                 }`}
               >
-                <span>{t.cta.label}</span>
-                <span className="font-mono text-[10px] opacity-60">→</span>
+                {t.cta.label}
               </Link>
             </motion.article>
           ))}

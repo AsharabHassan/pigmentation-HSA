@@ -15,13 +15,13 @@ export function StickyMobileCTA({ label, href }: { label: string; href: string }
     <div
       data-testid="sticky-mobile-cta"
       className={`fixed bottom-0 left-0 right-0 z-50 md:hidden
-                  border-t border-gold-500/30 bg-surface-black/95 backdrop-blur-md
+                  border-t border-surface-200 bg-surface-50/95 backdrop-blur-md
                   px-4 py-3 transition-opacity duration-300 ${show ? "opacity-100" : "opacity-0 pointer-events-none"}`}
     >
       <Link
         href={href as never}
-        className="block w-full text-center bg-gold-500 text-ink-900 px-5 py-3.5
-                   text-sm uppercase tracking-[0.18em] font-medium"
+        className="block w-full text-center bg-clay-500 text-surface-50 px-5 py-3.5
+                   text-sm uppercase tracking-[0.1em] font-semibold rounded-full"
       >
         {label}
       </Link>

@@ -1,7 +1,7 @@
 import "./globals.css";
-import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
+import { Spectral, Manrope, DM_Mono } from "next/font/google";
 
-const cormorant = Cormorant_Garamond({
+const spectral = Spectral({
   subsets: ["latin"],
   variable: "--font-display",
   weight: ["400", "500", "600", "700"],
@@ -9,10 +9,10 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
-const dmSans = DM_Sans({
+const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-body",
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -27,7 +27,7 @@ export const metadata = { title: "Harley Street Aesthetics — Glasgow" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className={`${cormorant.variable} ${dmSans.variable} ${dmMono.variable}`}>
+    <html lang="en-GB" className={`${spectral.variable} ${manrope.variable} ${dmMono.variable}`}>
       <body>{children}</body>
     </html>
   );

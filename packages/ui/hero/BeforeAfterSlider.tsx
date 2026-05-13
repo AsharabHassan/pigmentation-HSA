@@ -64,84 +64,63 @@ export function BeforeAfterSlider({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const rounded = Math.round(percent);
-
   return (
     <figure className={`relative w-full ${className ?? ""}`}>
       <div
         ref={containerRef}
-        className="relative w-full aspect-[4/5] overflow-hidden ring-1 ring-gold-500/30 bg-surface-charcoal select-none touch-none"
+        className="relative w-full aspect-[4/5] overflow-hidden bg-surface-100 select-none touch-none"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-        <Image
-          src={afterSrc} alt={afterAlt} fill priority
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
-        />
-        <div
-          className="absolute inset-0 overflow-hidden"
-          style={{ clipPath: `inset(0 ${100 - percent}% 0 0)` }}
-        >
-          <Image
-            src={beforeSrc} alt={beforeAlt} fill priority
-            sizes="(max-width: 768px) 100vw, 50vw"
-            className="object-cover"
-          />
+        <Image src={afterSrc} alt={afterAlt} fill priority sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+        <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - percent}% 0 0)` }}>
+          <Image src={beforeSrc} alt={beforeAlt} fill priority sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         </div>
 
-        <div aria-hidden className="absolute inset-x-0 bottom-0 h-24 pointer-events-none
-                                     bg-gradient-to-t from-black/55 to-transparent" />
-
-        <div
-          aria-hidden
-          className="absolute top-0 bottom-0 pointer-events-none"
-          style={{ left: `${percent}%`, transform: "translateX(-50%)" }}
-        >
+        <div aria-hidden className="absolute top-0 bottom-0 pointer-events-none" style={{ left: `${percent}%`, transform: "translateX(-50%)" }}>
           <div
-            className="absolute top-0 bottom-0 w-[16px] -left-[7px] transition-opacity duration-300"
-            style={{
-              opacity: dragging ? 0.85 : 0.4,
-              background: "radial-gradient(ellipse at center, rgba(201,166,92,0.55) 0%, rgba(201,166,92,0) 70%)",
-            }}
+            className="absolute top-0 bottom-0 w-px left-0 bg-surface-50"
+            style={{ boxShadow: dragging ? "0 0 12px rgba(184,90,60,0.6)" : "0 0 4px rgba(0,0,0,0.25)" }}
           />
-          <div className="absolute top-0 bottom-0 w-px left-0 bg-gold-500" />
         </div>
 
         <button
           type="button"
           role="slider"
           aria-label="Drag to reveal the after image"
-          aria-valuemin={0} aria-valuemax={100} aria-valuenow={rounded}
+          aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(percent)}
           tabIndex={0}
           onKeyDown={onKeyDown}
           className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2
-                     w-11 h-11 rounded-full bg-ivory-50 border-2 border-gold-500
-                     shadow-[0_4px_24px_rgba(0,0,0,0.5)]
-                     flex items-center justify-center text-ink-900
+                     w-12 h-12 rounded-full bg-surface-50 ring-2 ring-clay-500
+                     shadow-[0_4px_16px_rgba(26,22,18,0.25)]
+                     flex items-center justify-center text-clay-600
                      cursor-grab active:cursor-grabbing
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-300"
+                     focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-clay-300"
           style={{ left: `${percent}%` }}
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-            <path d="M2 8 L5 5 L5 11 Z" fill="currentColor" />
-            <path d="M14 8 L11 5 L11 11 Z" fill="currentColor" />
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden>
+            <path d="M3 9 L6 6 L6 12 Z" fill="currentColor" />
+            <path d="M15 9 L12 6 L12 12 Z" fill="currentColor" />
           </svg>
         </button>
 
-        <span className="absolute top-4 left-4 z-10 text-[10px] tracking-[0.22em] font-mono text-ivory-50 bg-black/55 px-2 py-1 backdrop-blur-sm uppercase pointer-events-none">
+        <span className="absolute top-4 left-4 z-10 text-[11px] uppercase tracking-[0.14em]
+                         text-ink-900 bg-surface-50/95 px-2.5 py-1 rounded-full font-semibold">
           {beforeLabel}
         </span>
-        <span className="absolute top-4 right-4 z-10 text-[10px] tracking-[0.22em] font-mono text-ivory-50 bg-black/55 px-2 py-1 backdrop-blur-sm uppercase pointer-events-none">
+        <span className="absolute top-4 right-4 z-10 text-[11px] uppercase tracking-[0.14em]
+                         text-surface-50 bg-clay-500 px-2.5 py-1 rounded-full font-semibold">
           {afterLabel}
         </span>
 
         {!hasMoved && (
-          <span className="absolute bottom-5 left-1/2 -translate-x-1/2 text-[11px] uppercase tracking-[0.18em]
-                           text-ivory-50/80 font-mono pointer-events-none">
-            ← Drag to reveal →
+          <span className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[11px] uppercase tracking-[0.14em]
+                           text-ink-900 bg-surface-50/95 px-3 py-1.5 rounded-full font-semibold
+                           pointer-events-none">
+            ← Drag to see results →
           </span>
         )}
       </div>

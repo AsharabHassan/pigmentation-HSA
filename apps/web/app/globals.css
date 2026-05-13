@@ -1,32 +1,54 @@
 @import "tailwindcss";
 @import "../../../packages/ui/tokens/tokens.css";
 
-/* Tell Tailwind v4 to scan our shared packages for utility classes */
 @source "../../../packages/ui/**/*.{ts,tsx}";
 @source "../../../packages/content/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 
 @theme {
+  /* Surface */
+  --color-surface-50:  var(--surface-50);
+  --color-surface-100: var(--surface-100);
+  --color-surface-200: var(--surface-200);
+  --color-surface-900: var(--surface-900);
+
+  /* Ink */
   --color-ink-900: var(--ink-900);
-  --color-ink-800: var(--ink-800);
   --color-ink-700: var(--ink-700);
   --color-ink-500: var(--ink-500);
-  --color-ink-400: var(--ink-400);
   --color-ink-300: var(--ink-300);
-  --color-ivory-50:  var(--ivory-50);
-  --color-ivory-100: var(--ivory-100);
-  --color-ivory-200: var(--ivory-200);
-  --color-surface-black:    var(--surface-black);
-  --color-surface-charcoal: var(--surface-charcoal);
-  --color-surface-ash:      var(--surface-ash);
-  --color-aubergine-900: var(--aubergine-900);
-  --color-aubergine-700: var(--aubergine-700);
-  --color-gold-300: var(--gold-300);
-  --color-gold-400: var(--gold-400);
-  --color-gold-500: var(--gold-500);
-  --color-gold-600: var(--gold-600);
-  --color-gold-700: var(--gold-700);
-  --color-gold-200: var(--gold-300);
+  --color-ink-800: var(--ink-900);
+  --color-ink-400: var(--ink-500);
+
+  /* Clay (primary accent) */
+  --color-clay-50:  var(--clay-50);
+  --color-clay-100: var(--clay-100);
+  --color-clay-300: var(--clay-300);
+  --color-clay-500: var(--clay-500);
+  --color-clay-600: var(--clay-600);
+  --color-clay-700: var(--clay-700);
+
+  /* Moss (trust accent) */
+  --color-moss-400: var(--moss-400);
+  --color-moss-500: var(--moss-500);
+  --color-moss-700: var(--moss-700);
+
+  /* Legacy aliases for unrefactored components — map to new palette */
+  --color-ivory-50:  var(--surface-50);
+  --color-ivory-100: var(--surface-100);
+  --color-ivory-200: var(--surface-200);
+  --color-surface-black:    var(--surface-50);
+  --color-surface-charcoal: var(--surface-100);
+  --color-surface-ash:      var(--surface-200);
+  --color-gold-300: var(--clay-300);
+  --color-gold-400: var(--clay-300);
+  --color-gold-500: var(--clay-500);
+  --color-gold-600: var(--clay-600);
+  --color-gold-700: var(--clay-700);
+  --color-gold-200: var(--clay-100);
+  --color-aubergine-900: var(--surface-900);
+  --color-aubergine-700: var(--ink-900);
+
   --color-error-500: var(--error-500);
   --font-display: var(--font-display);
   --font-body:    var(--font-body);
@@ -34,17 +56,9 @@
 
 html { scroll-behavior: smooth; }
 html, body {
-  background: var(--surface-black);
-  color: var(--ivory-50);
+  background: var(--surface-50);
+  color: var(--ink-900);
 }
-
-/* Hide scrollbars on the mobile snap-carousels */
-.scrollbar-none {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.scrollbar-none::-webkit-scrollbar { display: none; }
-
 body {
   font-family: var(--font-body);
   font-size: 16px;
@@ -53,24 +67,18 @@ body {
 }
 h1, h2, h3 {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  color: var(--ivory-50);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+  color: var(--ink-900);
 }
-::selection { background: var(--gold-500); color: var(--ink-900); }
+::selection { background: var(--clay-500); color: var(--surface-50); }
 *:focus-visible {
-  outline: 2px solid var(--gold-500);
+  outline: 2px solid var(--clay-500);
   outline-offset: 3px;
   border-radius: 2px;
 }
 
-/* Subtle film-grain texture on dark surfaces */
-.grain::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.18'/></svg>");
-  pointer-events: none;
-  opacity: 0.5;
-  mix-blend-mode: overlay;
-}
+/* Snap-carousel scrollbars hidden */
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }
