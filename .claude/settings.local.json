@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Get-Content 'Search keyword report \\(25\\).csv' -TotalCount 5\")",
+      "WebFetch(domain:harleystreetmedics.clinic)",
+      "PowerShell(Import-Csv *)",
+      "PowerShell($raw = Get-Content 'Search keyword report \\(25\\).csv'; $csv = $raw[2..\\($raw.Count-1\\)] | ConvertFrom-Csv; Write-Host \"Total: $\\($csv.Count\\)\"; $csv | Select-Object -First 1 | ForEach-Object { $_.PSObject.Properties | ForEach-Object { Write-Host \"$\\($_.Name\\) = [$\\($_.Value\\)]\" } })",
+      "PowerShell($raw = Get-Content 'Search keyword report \\(25\\).csv'; $csv = $raw[2..\\($raw.Count-1\\)] | ConvertFrom-Csv; $conv = $csv | Where-Object { [double]$_.Conversions -gt 0 }; Write-Host \"=== KEYWORDS WITH CONVERSIONS: $\\($conv.Count\\) ===\"; $conv | Sort-Object { [double]$_.Conversions } -Descending | Select-Object Keyword, 'Match type', Clicks, 'Impr.', CTR, Conversions, 'Cost / conv.', Cost, 'Conv. rate' | Format-Table -AutoSize | Out-String -Width 220)",
+      "Bash(npm --version)",
+      "Bash(pnpm --version)"
+    ]
+  }
+}
