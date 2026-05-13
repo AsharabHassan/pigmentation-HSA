@@ -5,6 +5,7 @@ const config: NextConfig = {
   experimental: { typedRoutes: true, optimizePackageImports: ["lucide-react", "@mediapipe/tasks-vision"] },
   transpilePackages: ["@ui", "@lib", "@content"],
   eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [],

@@ -1,7 +1,9 @@
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
 
-export function Eyebrow({ className, ...props }: HTMLAttributes<HTMLSpanElement>) {
+interface Props extends HTMLAttributes<HTMLSpanElement> { children?: ReactNode; }
+
+export function Eyebrow({ className, ...props }: Props) {
   return (
     <span
       className={clsx(

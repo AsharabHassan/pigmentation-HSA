@@ -1,7 +1,9 @@
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
 
-export interface CardProps extends HTMLAttributes<HTMLElement> {}
+export interface CardProps extends HTMLAttributes<HTMLElement> {
+  children?: ReactNode;
+}
 
 export function Card({ className, ...props }: CardProps) {
   return (

@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
 
 type Width = "narrow" | "content" | "wide" | "bleed";
@@ -10,10 +10,11 @@ const widthMap: Record<Width, string> = {
   bleed: "max-w-none",
 };
 
-export function Container({
-  width = "content",
-  className,
-  ...props
-}: HTMLAttributes<HTMLDivElement> & { width?: Width }) {
+interface Props extends HTMLAttributes<HTMLDivElement> {
+  width?: Width;
+  children?: ReactNode;
+}
+
+export function Container({ width = "content", className, ...props }: Props) {
   return <div className={clsx("mx-auto px-6 md:px-8", widthMap[width], className)} {...props} />;
 }

@@ -1,10 +1,11 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
 
 type Variant = "primary" | "secondary" | "link";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
+  children?: ReactNode;
 }
 
 const variants: Record<Variant, string> = {

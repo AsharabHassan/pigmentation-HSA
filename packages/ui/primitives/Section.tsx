@@ -1,7 +1,9 @@
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { clsx } from "clsx";
 
-export function Section({ className, ...props }: HTMLAttributes<HTMLElement>) {
+interface Props extends HTMLAttributes<HTMLElement> { children?: ReactNode; }
+
+export function Section({ className, ...props }: Props) {
   return (
     <section
       className={clsx("py-24 md:py-32", className)}

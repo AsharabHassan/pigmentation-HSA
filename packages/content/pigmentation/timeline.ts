@@ -1,0 +1,28 @@
+import type { TimelineStage } from "@ui/timeline/TimelineScrubber";
+
+export const timelineStages: TimelineStage[] = [
+  { weekLabel: "Day 0",
+    contextLine: "Starting point. Your skin is assessed and your protocol is calibrated to your Fitzpatrick type.",
+    sessionLine: "Free consultation + skin assessment",
+    imgSrc: "/images/timeline/day-0.jpg" },
+  { weekLabel: "Wk 2",
+    contextLine: "Early response: subtle lightening as pigment begins to clear from the upper dermal layers.",
+    sessionLine: "Session 1 — VirtueRF + Pulsed Laser",
+    imgSrc: "/images/timeline/wk-2.jpg" },
+  { weekLabel: "Wk 4",
+    contextLine: "Pigment may temporarily darken before clearance — this is expected and part of how the protocol works. Daily SPF is non-negotiable.",
+    sessionLine: "Session 2 — Exosome therapy",
+    imgSrc: "/images/timeline/wk-4.jpg" },
+  { weekLabel: "Wk 6",
+    contextLine: "Clearance is visible across the treated zones. Tone is starting to even out across the face.",
+    sessionLine: "Session 3 — Targeted mesotherapy",
+    imgSrc: "/images/timeline/wk-6.jpg" },
+  { weekLabel: "Wk 9",
+    contextLine: "Most patients see meaningful evening of tone by this point. Maintenance peel may be added.",
+    sessionLine: "Maintenance — Clarity Peel (optional)",
+    imgSrc: "/images/timeline/wk-9.jpg" },
+  { weekLabel: "Wk 12",
+    contextLine: "Final result. Sustained clearance — typically holds with quarterly maintenance + daily SPF.",
+    sessionLine: "Review + maintenance plan",
+    imgSrc: "/images/timeline/wk-12.jpg" },
+];
