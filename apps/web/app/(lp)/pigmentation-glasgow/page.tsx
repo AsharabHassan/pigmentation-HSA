@@ -20,7 +20,7 @@ import {
 } from "./ClientInteractives";
 
 export const metadata: Metadata = {
-  title: "Pigmentation Removal Glasgow — Doctor-Led Clinic | Harley Street Medics",
+  title: "Pigmentation Removal Glasgow — Doctor-Led Clinic | Harley Street Aesthetics",
   description: "Doctor-led pigmentation clinic in Glasgow. Calibrated for all skin types (Fitzpatrick I–VI). 3-step protocol with no rebound. Free consultation.",
   alternates: { canonical: "/pigmentation-glasgow" },
   openGraph: {

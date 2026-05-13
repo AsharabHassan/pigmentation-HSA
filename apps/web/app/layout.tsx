@@ -15,7 +15,7 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata = { title: "Harley Street Medics — Glasgow" };
+export const metadata = { title: "Harley Street Aesthetics — Glasgow" };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

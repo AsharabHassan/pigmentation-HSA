@@ -7,7 +7,7 @@ export function Eyebrow({ className, ...props }: Props) {
   return (
     <span
       className={clsx(
-        "inline-block text-xs font-medium uppercase tracking-[0.12em] text-gold-500",
+        "inline-block text-xs font-medium uppercase tracking-[0.22em] text-gold-500",
         className,
       )}
       {...props}

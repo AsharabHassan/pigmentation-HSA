@@ -27,7 +27,7 @@ export async function GET(
       >
         <div style={{ display: "flex", gap: 12 }}>
           <span style={{ fontSize: 18, letterSpacing: 4, color: "#B8945A", textTransform: "uppercase" }}>
-            Harley Street Medics · Glasgow
+            Harley Street Aesthetics · Glasgow
           </span>
         </div>
         <div style={{ fontSize: 72, color: "#0E0B0A", lineHeight: 1.05, maxWidth: 900, letterSpacing: -1 }}>

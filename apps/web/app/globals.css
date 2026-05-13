@@ -1,24 +1,67 @@
 @import "tailwindcss";
 @import "../../../packages/ui/tokens/tokens.css";
 
+/* Tell Tailwind v4 to scan our shared packages for utility classes */
+@source "../../../packages/ui/**/*.{ts,tsx}";
+@source "../../../packages/content/**/*.{ts,tsx}";
+@source "../**/*.{ts,tsx}";
+
 @theme {
   --color-ink-900: var(--ink-900);
+  --color-ink-800: var(--ink-800);
   --color-ink-700: var(--ink-700);
   --color-ink-500: var(--ink-500);
+  --color-ink-400: var(--ink-400);
   --color-ink-300: var(--ink-300);
   --color-ivory-50:  var(--ivory-50);
   --color-ivory-100: var(--ivory-100);
   --color-ivory-200: var(--ivory-200);
+  --color-surface-black:    var(--surface-black);
+  --color-surface-charcoal: var(--surface-charcoal);
+  --color-surface-ash:      var(--surface-ash);
   --color-aubergine-900: var(--aubergine-900);
   --color-aubergine-700: var(--aubergine-700);
-  --color-gold-500: var(--gold-500);
+  --color-gold-300: var(--gold-300);
   --color-gold-400: var(--gold-400);
-  --color-gold-200: var(--gold-200);
+  --color-gold-500: var(--gold-500);
+  --color-gold-600: var(--gold-600);
+  --color-gold-700: var(--gold-700);
+  --color-gold-200: var(--gold-300);
+  --color-error-500: var(--error-500);
   --font-display: var(--font-display);
   --font-body:    var(--font-body);
 }
 
-html, body { background: var(--ivory-50); color: var(--ink-900); }
-body { font-family: var(--font-body); font-size: 16px; line-height: 1.55; }
-h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; line-height: 1.1; }
-*:focus-visible { outline: 3px solid var(--gold-200); outline-offset: 2px; border-radius: 2px; }
+html, body {
+  background: var(--surface-black);
+  color: var(--ivory-50);
+}
+body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--ivory-50);
+}
+::selection { background: var(--gold-500); color: var(--ink-900); }
+*:focus-visible {
+  outline: 2px solid var(--gold-500);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Subtle film-grain texture on dark surfaces */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.18'/></svg>");
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+}
