@@ -180,10 +180,12 @@ export async function analyzeSkin(input: {
   const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic();
 
+  // Note: adaptive thinking is incompatible with forced tool_choice on Opus 4.7
+  // (400: "Thinking may not be enabled when tool_choice forces tool use").
+  // The vision task is structured enough not to need it.
   const response = await client.messages.create({
     model: "claude-opus-4-7",
     max_tokens: 4096,
-    thinking: { type: "adaptive" },
     system: [
       {
         type: "text",
