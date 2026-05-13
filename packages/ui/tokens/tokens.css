@@ -56,8 +56,9 @@
     --ease-soft:   cubic-bezier(0.4, 0, 0.2, 1);
 
     /* TYPE */
-    --font-display: var(--font-fraunces), "Times New Roman", Georgia, serif;
-    --font-body:    var(--font-inter), -apple-system, "Segoe UI", sans-serif;
+    --font-display: "Cormorant Garamond", "Times New Roman", Georgia, serif;
+    --font-body:    "DM Sans", -apple-system, "Segoe UI", sans-serif;
+    --font-mono:    "DM Mono", "SF Mono", Consolas, monospace;
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -16,6 +16,8 @@ export interface HeroProps {
   afterSrc: string;
   beforeAlt: string;
   afterAlt: string;
+  beforeLabel?: string;
+  afterLabel?: string;
   rating: number;
   reviewCount: number;
   fallbackHeadline?: string;
@@ -36,6 +38,7 @@ export function Hero(p: HeroProps) {
               <BeforeAfterSlider
                 beforeSrc={p.beforeSrc} afterSrc={p.afterSrc}
                 beforeAlt={p.beforeAlt} afterAlt={p.afterAlt}
+                beforeLabel={p.beforeLabel} afterLabel={p.afterLabel}
               />
             </div>
           </div>
