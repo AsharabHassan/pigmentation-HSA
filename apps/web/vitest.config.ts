@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
+import path from "node:path";
 
 export default defineConfig({
   plugins: [react()],
@@ -8,13 +9,17 @@ export default defineConfig({
     setupFiles: ["./tests/setup.ts"],
     globals: true,
     css: false,
+    include: [
+      "tests/**/*.{test,spec}.{ts,tsx}",
+      "../../packages/**/*.{test,spec}.{ts,tsx}",
+    ],
   },
   resolve: {
     alias: {
-      "@": new URL("./", import.meta.url).pathname,
-      "@ui": new URL("../../packages/ui", import.meta.url).pathname,
-      "@lib": new URL("../../packages/lib", import.meta.url).pathname,
-      "@content": new URL("../../packages/content", import.meta.url).pathname,
+      "@": path.resolve(__dirname, "./"),
+      "@ui": path.resolve(__dirname, "../../packages/ui"),
+      "@lib": path.resolve(__dirname, "../../packages/lib"),
+      "@content": path.resolve(__dirname, "../../packages/content"),
     },
   },
 });
