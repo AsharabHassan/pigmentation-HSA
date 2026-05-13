@@ -3,8 +3,8 @@ export const hero = {
   fallbackHeadline: "Clear pigmentation. Permanently. Without rebound.",
   subtext:
     "A doctor-led 3-step protocol developed at Harley Street Aesthetics. Calibrated to every skin type — including Fitzpatrick IV–VI.",
-  primaryCta: { label: "Take 60-Second Skin Diagnostic", href: "#quiz" },
-  secondaryCta: { label: "Book Free Consultation", href: "#book" },
+  primaryCta: { label: "Book Free Consultation", href: "#book" },
+  secondaryCta: { label: "Get AI Skin Analysis", href: "#pigmentation-map" },
   beforeSrc: "/images/hero/before-melasma.svg",
   afterSrc: "/images/hero/after-melasma.svg",
   beforeAlt: "Before treatment — visible melasma across cheeks",

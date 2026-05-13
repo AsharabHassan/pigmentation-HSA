@@ -46,8 +46,8 @@ export function NavBar() {
                   className="py-3 text-ivory-50/85 hover:text-gold-400 transition-colors">Treatments</Link>
             <Link href="#doctor" onClick={() => setOpen(false)}
                   className="py-3 text-ivory-50/85 hover:text-gold-400 transition-colors">The Doctor</Link>
-            <Link href="#quiz" onClick={() => setOpen(false)}
-                  className="py-3 text-ivory-50/85 hover:text-gold-400 transition-colors">Skin Diagnostic</Link>
+            <Link href="#pigmentation-map" onClick={() => setOpen(false)}
+                  className="py-3 text-ivory-50/85 hover:text-gold-400 transition-colors">AI Skin Analysis</Link>
             <Link href="#faq" onClick={() => setOpen(false)}
                   className="py-3 text-ivory-50/85 hover:text-gold-400 transition-colors">FAQ</Link>
             <Link href="#book" onClick={() => setOpen(false)}

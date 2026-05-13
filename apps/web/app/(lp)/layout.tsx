@@ -9,7 +9,7 @@ export default function LpLayout({ children }: { children: React.ReactNode }) {
       <NavBar />
       <ChapterRail />
       <main>{children}</main>
-      <StickyMobileCTA label="Take Skin Quiz →" href="#quiz" />
+      <StickyMobileCTA label="Book Free Consultation →" href="#book" />
       <Footer />
     </>
   );

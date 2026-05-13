@@ -16,7 +16,7 @@ import {
   ClientSelfieScanner,
   ClientMechanismAnimation,
   ClientTimelineScrubber,
-  ClientQuizSection,
+  ClientBookingSection,
 } from "./ClientInteractives";
 
 export const metadata: Metadata = {
@@ -43,7 +43,7 @@ export default function PigmentationLpPage() {
       <DoctorSection {...doctor} />
       <Testimonials items={testimonials} />
       <PricingCards />
-      <ClientQuizSection />
+      <ClientBookingSection />
       <FAQ
         heading="Frequently asked — pigmentation treatment in Glasgow"
         entries={faqOnPage}

@@ -7,12 +7,13 @@ interface Chapter { id: string; label: string }
 const chapters: Chapter[] = [
   { id: "hero",          label: "Opening" },
   { id: "treatments",    label: "Concerns" },
-  { id: "pigmentation-map", label: "Cartography" },
+  { id: "pigmentation-map", label: "AI Analysis" },
   { id: "how-it-works",  label: "Mechanism" },
-  { id: "timeline",      label: "Chapters" },
-  { id: "doctor",        label: "Practitioner" },
+  { id: "timeline",      label: "Timeline" },
+  { id: "doctor",        label: "The Doctor" },
   { id: "pricing",       label: "Investment" },
-  { id: "faq",           label: "Reference" },
+  { id: "book",          label: "Book" },
+  { id: "faq",           label: "FAQ" },
 ];
 
 /**

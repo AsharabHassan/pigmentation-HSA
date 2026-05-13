@@ -2,11 +2,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Container } from "../primitives/Container";
+import { Input } from "../primitives/Input";
 import { Camera, Upload, Lock, RotateCcw, ShieldCheck } from "lucide-react";
 import { CartographyAtlas, type AtlasZone } from "./CartographyAtlas";
 
-type Phase = "idle" | "preview" | "scanning" | "revealed" | "error";
+type Phase = "idle" | "preview" | "scanning" | "gate" | "revealed" | "error";
 
 interface SkinZone {
   region: string;
@@ -59,12 +61,8 @@ export function SelfieScanner() {
     setError(null);
 
     try {
-      // Phone selfies are typically 3-15MB raw — downscale to 1024px on the
-      // long edge and re-encode as JPEG so the request body stays well under
-      // the server limit. The Claude analysis doesn't need more pixels than this.
       const { base64, mediaType } = await downscaleAndEncode(fileRef.current, 1024, 0.82);
 
-      // Min animation time so the scan feels deliberate
       const [res] = await Promise.all([
         fetch("/api/analyze-skin", {
           method: "POST",
@@ -74,16 +72,14 @@ export function SelfieScanner() {
         new Promise(r => setTimeout(r, 2200)),
       ]);
 
-      if (!res.ok) {
-        throw new Error(`Server error ${res.status}`);
-      }
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
 
       const data = (await res.json()) as { ok: boolean; analysis?: SkinAnalysis; error?: string };
       if (!data.ok || !data.analysis) {
         throw new Error(data.error || "Analysis failed");
       }
       setAnalysis(data.analysis);
-      setPhase("revealed");
+      setPhase("gate"); // ← Lead gate before reveal
     } catch (e) {
       console.error("[scanner]", e);
       setError(e instanceof Error ? e.message : "Analysis failed");
@@ -119,13 +115,20 @@ export function SelfieScanner() {
           <span className="text-gold-400">like a clinician.</span>
         </h2>
         <p className="mt-6 text-base md:text-lg text-ivory-50/65 max-w-2xl leading-relaxed">
-          Upload a well-lit selfie. Our AI analyses your pigmentation pattern and renders a private topographic atlas — non-diagnostic, but accurate enough to give you a personalised protocol recommendation.
+          Upload a well-lit selfie. Our AI analyses your pigmentation pattern, renders a private atlas, and matches you with the right protocol — your full report unlocks once we know where to send it.
         </p>
 
         <div className="mt-14 md:mt-20">
           {phase === "idle"     && <IdleState onFile={handleFile} />}
           {phase === "preview"  && imgUrl && <PreviewState imgUrl={imgUrl} onStart={startScan} onReset={reset} />}
           {phase === "scanning" && imgUrl && <ScanningState imgUrl={imgUrl} />}
+          {phase === "gate"     && analysis && (
+            <LeadGateState
+              analysis={analysis}
+              onUnlock={() => setPhase("revealed")}
+              onReset={reset}
+            />
+          )}
           {phase === "revealed" && analysis && <RevealedState analysis={analysis} onReset={reset} />}
           {phase === "error"    && <ErrorState message={error ?? "Something went wrong"} onReset={reset} />}
         </div>
@@ -199,11 +202,7 @@ function IdleState({ onFile }: { onFile: (f: File) => void }) {
 
 function PreviewState({
   imgUrl, onStart, onReset,
-}: {
-  imgUrl: string;
-  onStart: () => void;
-  onReset: () => void;
-}) {
+}: { imgUrl: string; onStart: () => void; onReset: () => void }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-[60%_40%] gap-10 items-start">
       <div className="relative aspect-[4/5] bg-surface-charcoal ring-1 ring-gold-500/30 overflow-hidden">
@@ -221,7 +220,7 @@ function PreviewState({
           Selfie loaded.
         </h3>
         <p className="mt-4 text-ivory-50/65 leading-relaxed text-sm md:text-base">
-          Claude will analyse pigmentation patterns, estimate your skin type, and recommend a protocol calibrated to your case. The image is sent securely and not stored.
+          Claude will analyse pigmentation patterns, estimate your skin type, and recommend a protocol calibrated to your case.
         </p>
 
         <button
@@ -278,6 +277,183 @@ function ScanningState({ imgUrl }: { imgUrl: string }) {
           Identifying pigmentation zones, estimating Fitzpatrick type, and matching against the clinic&apos;s treatment protocols.
         </p>
       </div>
+    </div>
+  );
+}
+
+interface LeadFormFields {
+  fullName: string;
+  email: string;
+  phone: string;
+  phoneCountry: string;
+  consent: boolean;
+  marketingConsent: boolean;
+}
+
+function LeadGateState({
+  analysis, onUnlock, onReset,
+}: { analysis: SkinAnalysis; onUnlock: () => void; onReset: () => void }) {
+  const { register, handleSubmit, formState: { isValid, isSubmitting }, watch } = useForm<LeadFormFields>({
+    mode: "onChange",
+    defaultValues: { phoneCountry: "GB", consent: false, marketingConsent: false },
+  });
+  const [serverError, setServerError] = useState<string | null>(null);
+  const consentChecked = watch("consent");
+
+  const atlasZones: AtlasZone[] = analysis.zones.map(z => ({
+    x: z.x, y: z.y, radius: z.radius, intensity: z.intensity, region: z.region,
+  }));
+
+  const onSubmit = async (form: LeadFormFields) => {
+    setServerError(null);
+    try {
+      const utm = readUtm();
+      const res = await fetch("/api/lead/submit", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.fullName,
+          email: form.email,
+          rawPhone: form.phone,
+          phoneCountry: form.phoneCountry,
+          consent: form.consent,
+          marketingConsent: form.marketingConsent,
+          source: "lp-pigmentation-scanner",
+          // Map Claude's analysis into the quiz schema so it lands in GHL with full context
+          quiz: {
+            primary_concern: mapConcernToQuiz(analysis.dominant_concern),
+            duration: "years",
+            fitzpatrick: analysis.fitzpatrick,
+            tried_before: ["nothing"],
+            goal: analysis.severity === "severe" ? "clear" : "80% reduction",
+            timing: "within a month",
+            location: "Glasgow",
+          },
+          utm,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        const msg =
+          data?.fieldErrors
+            ? Object.values(data.fieldErrors).join(" · ")
+            : data?.error || `Server error ${res.status}`;
+        throw new Error(msg);
+      }
+      // Unlock the reveal regardless of GHL status — KV fallback handles delivery
+      onUnlock();
+    } catch (e) {
+      setServerError(e instanceof Error ? e.message : "Could not unlock report");
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-[55%_45%] gap-10 items-start">
+      {/* Blurred preview — what they'll get */}
+      <div className="relative">
+        <div className="relative aspect-[4/5] bg-surface-charcoal ring-1 ring-gold-500/30 overflow-hidden">
+          <div className="absolute inset-0 blur-md">
+            <CartographyAtlas zones={atlasZones} skin={analysis.fitzpatrick} />
+          </div>
+          <div aria-hidden className="absolute inset-0 bg-surface-black/35" />
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="text-center">
+              <Lock size={36} className="text-gold-400 mx-auto" aria-hidden />
+              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.32em] text-gold-400">
+                Locked
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2 font-mono text-[10px] uppercase tracking-[0.22em]">
+          <SpecCell label="Zones" value={analysis.zones.length.toString().padStart(2, "0")} />
+          <SpecCell label="Skin Type" value={`Fitzpatrick ${analysis.fitzpatrick}`} />
+          <SpecCell label="Concern" value={CONCERN_LABEL[analysis.dominant_concern] ?? "—"} />
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="md:pt-2">
+        <p className="font-mono text-[10px] uppercase tracking-[0.32em] text-gold-500/70">
+          One last step
+        </p>
+        <h3 className="mt-3 font-display italic text-3xl md:text-4xl text-ivory-50 leading-tight">
+          Unlock your full report.
+        </h3>
+        <p className="mt-4 text-ivory-50/65 leading-relaxed text-sm md:text-base">
+          Tell us where to send your atlas. We&apos;ll also reach out within one working day to offer a free online consultation.
+        </p>
+
+        <div className="mt-7 flex flex-col gap-4">
+          <Input
+            id="scanner-name" label="Full name *" autoComplete="name"
+            {...register("fullName", { required: true, minLength: 2 })}
+          />
+          <Input
+            id="scanner-email" label="Email *" type="email" autoComplete="email"
+            {...register("email", { required: true, pattern: /^[^@\s]+@[^@\s]+\.[^@\s]+$/ })}
+          />
+          <div className="grid grid-cols-[110px_1fr] gap-3">
+            <div>
+              <label htmlFor="scanner-country" className="block text-xs uppercase tracking-[0.18em] text-gold-500 mb-2">
+                Country
+              </label>
+              <select id="scanner-country"
+                className="w-full bg-ivory-200 border border-ink-300 px-3 py-3 text-base text-ink-900 focus:border-gold-500 outline-none"
+                {...register("phoneCountry")}>
+                <option value="GB">🇬🇧 +44</option>
+                <option value="IE">🇮🇪 +353</option>
+                <option value="US">🇺🇸 +1</option>
+                <option value="AE">🇦🇪 +971</option>
+                <option value="PK">🇵🇰 +92</option>
+                <option value="IN">🇮🇳 +91</option>
+              </select>
+            </div>
+            <Input
+              id="scanner-phone" label="Mobile *" type="tel" autoComplete="tel"
+              helpText="We'll send your atlas + booking link by SMS"
+              {...register("phone", { required: true, minLength: 7 })}
+            />
+          </div>
+
+          <label className="flex items-start gap-3 text-sm text-ivory-50/85 cursor-pointer">
+            <input type="checkbox" className="mt-1 accent-gold-500" {...register("consent", { required: true })} />
+            <span>I consent to be contacted about my plan by the clinic. <span className="text-error-500">*</span></span>
+          </label>
+          <label className="flex items-start gap-3 text-sm text-ivory-50/70 cursor-pointer">
+            <input type="checkbox" className="mt-1 accent-gold-500" {...register("marketingConsent")} />
+            <span>Send me occasional skincare tips. (Optional)</span>
+          </label>
+
+          {serverError && (
+            <p className="text-sm text-error-500">{serverError}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={!isValid || !consentChecked || isSubmitting}
+            className="mt-2 inline-flex items-center justify-between bg-gold-500 text-ink-900 px-6 py-4
+                       text-[11px] uppercase tracking-[0.24em] font-semibold
+                       hover:bg-gold-400 transition-colors
+                       disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span>{isSubmitting ? "Unlocking…" : "Unlock my report"}</span>
+            <span className="font-mono text-[10px] opacity-60">→</span>
+          </button>
+
+          <p className="text-[10px] font-mono uppercase tracking-[0.22em] text-gold-500/45">
+            🔒 Encrypted. GDPR-compliant. Never shared.
+          </p>
+
+          <button
+            type="button"
+            onClick={onReset}
+            className="self-start flex items-center gap-2 mt-2 font-mono text-[10px] uppercase tracking-[0.22em] text-gold-500/55 hover:text-gold-400"
+          >
+            <RotateCcw size={12} aria-hidden /> Try a different photo
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
@@ -358,6 +534,15 @@ function ErrorState({ message, onReset }: { message: string; onReset: () => void
   );
 }
 
+function SpecCell({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-t border-gold-500/20 pt-2">
+      <div className="text-gold-500/55 text-[9px]">{label}</div>
+      <div className="text-ivory-50 mt-0.5 truncate">{value}</div>
+    </div>
+  );
+}
+
 function DataRow({ k, v }: { k: string; v: string }) {
   return (
     <div className="flex items-baseline justify-between gap-4 border-b border-gold-500/15 pb-2">
@@ -367,15 +552,40 @@ function DataRow({ k, v }: { k: string; v: string }) {
   );
 }
 
-/**
- * Downscale a user-selected image to `maxSide` px on the long edge and
- * re-encode as JPEG. Keeps the upload small enough for the API body limit
- * and reduces tokens spent on the Claude vision call.
- */
+// Map Claude's dominant_concern to the quiz schema enum
+function mapConcernToQuiz(concern: string): string {
+  const map: Record<string, string> = {
+    melasma: "melasma",
+    "sun-damage": "sun-damage",
+    "post-acne": "post-acne",
+    "uneven-tone": "uneven-tone",
+    "lip-pigment": "lip-pigment",
+    other: "not-sure",
+    "none-detected": "not-sure",
+  };
+  return map[concern] ?? "not-sure";
+}
+
+function readUtm() {
+  if (typeof window === "undefined") {
+    return { utm_source: null, utm_medium: null, utm_campaign: null, utm_term: null,
+             gclid: null, fbclid: null, landing_page_url: null, referrer: null };
+  }
+  const p = new URLSearchParams(window.location.search);
+  return {
+    utm_source:       p.get("utm_source"),
+    utm_medium:       p.get("utm_medium"),
+    utm_campaign:     p.get("utm_campaign"),
+    utm_term:         p.get("utm_term"),
+    gclid:            p.get("gclid"),
+    fbclid:           p.get("fbclid"),
+    landing_page_url: window.location.href,
+    referrer:         document.referrer || null,
+  };
+}
+
 async function downscaleAndEncode(
-  file: File,
-  maxSide: number,
-  jpegQuality: number,
+  file: File, maxSide: number, jpegQuality: number,
 ): Promise<{ base64: string; mediaType: "image/jpeg" }> {
   const bitmap = await loadBitmap(file);
   const ratio = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
@@ -383,8 +593,7 @@ async function downscaleAndEncode(
   const h = Math.round(bitmap.height * ratio);
 
   const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = w; canvas.height = h;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Browser canvas unavailable");
   ctx.drawImage(bitmap, 0, 0, w, h);
@@ -402,13 +611,8 @@ async function downscaleAndEncode(
 
 async function loadBitmap(file: File): Promise<ImageBitmap | HTMLImageElement> {
   if (typeof createImageBitmap === "function") {
-    try {
-      return await createImageBitmap(file);
-    } catch {
-      // fall through to HTMLImageElement fallback
-    }
+    try { return await createImageBitmap(file); } catch { /* fall through */ }
   }
-  // Fallback for browsers without createImageBitmap (rare)
   const url = URL.createObjectURL(file);
   try {
     return await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -417,9 +621,7 @@ async function loadBitmap(file: File): Promise<ImageBitmap | HTMLImageElement> {
       img.onerror = () => reject(new Error("Could not load image"));
       img.src = url;
     });
-  } finally {
-    URL.revokeObjectURL(url);
-  }
+  } finally { URL.revokeObjectURL(url); }
 }
 
 async function blobToBase64(blob: Blob): Promise<string> {
@@ -430,7 +632,5 @@ async function blobToBase64(blob: Blob): Promise<string> {
   for (let i = 0; i < bytes.length; i += chunkSize) {
     binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
   }
-  return typeof btoa !== "undefined"
-    ? btoa(binary)
-    : Buffer.from(binary, "binary").toString("base64");
+  return typeof btoa !== "undefined" ? btoa(binary) : Buffer.from(binary, "binary").toString("base64");
 }

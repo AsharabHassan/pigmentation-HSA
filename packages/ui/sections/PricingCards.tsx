@@ -19,7 +19,7 @@ const tiers = [
     price: "£399",
     cadence: "per session · 4–6 typical",
     features: ["VirtueRF microchanneling", "Pulsed-laser pigment fragmentation", "Exosome + mesotherapy infusion", "Calibrated for Fitzpatrick I–VI"],
-    cta: { label: "Take the diagnostic", href: "#quiz" },
+    cta: { label: "Book consultation", href: "#book" },
     featured: true,
   },
   {
