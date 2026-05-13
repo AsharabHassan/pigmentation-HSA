@@ -1,0 +1,61 @@
+@layer tokens {
+  :root {
+    /* INK */
+    --ink-900: #0E0B0A;
+    --ink-700: #2A2422;
+    --ink-500: #6B5F5B;
+    --ink-300: #C4B8B0;
+
+    /* IVORY */
+    --ivory-50:  #FAF6F1;
+    --ivory-100: #F2EBE2;
+    --ivory-200: #E6DCCF;
+
+    /* AUBERGINE */
+    --aubergine-900: #2A1422;
+    --aubergine-700: #4A2438;
+
+    /* GOLD */
+    --gold-500: #B8945A;
+    --gold-400: #C9A874;
+    --gold-200: #E8D8B8;
+
+    /* FUNCTIONAL */
+    --clinical-blue-500: #4A6B7D;
+    --success-500: #5B7A52;
+    --warn-500:    #B8763A;
+    --error-500:   #A03A2E;
+
+    /* SPACING */
+    --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+    --space-6: 24px;  --space-8: 32px;  --space-12: 48px; --space-16: 64px;
+    --space-24: 96px; --space-32: 128px; --space-40: 160px; --space-48: 192px;
+
+    /* CONTAINERS */
+    --w-narrow:  640px;
+    --w-content: 960px;
+    --w-wide:   1240px;
+
+    /* MOTION */
+    --dur-snap:   120ms;
+    --dur-quick:  240ms;
+    --dur-glide:  480ms;
+    --dur-cinema: 820ms;
+    --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-soft:   cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* TYPE */
+    --font-display: var(--font-fraunces), "Times New Roman", Georgia, serif;
+    --font-body:    var(--font-inter), -apple-system, "Segoe UI", sans-serif;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --dur-snap:   1ms;
+      --dur-quick:  1ms;
+      --dur-glide:  1ms;
+      --dur-cinema: 1ms;
+    }
+  }
+}

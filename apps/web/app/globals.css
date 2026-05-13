@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import "../../../packages/ui/tokens/tokens.css";
+
+@theme {
+  --color-ink-900: var(--ink-900);
+  --color-ink-700: var(--ink-700);
+  --color-ink-500: var(--ink-500);
+  --color-ink-300: var(--ink-300);
+  --color-ivory-50:  var(--ivory-50);
+  --color-ivory-100: var(--ivory-100);
+  --color-ivory-200: var(--ivory-200);
+  --color-aubergine-900: var(--aubergine-900);
+  --color-aubergine-700: var(--aubergine-700);
+  --color-gold-500: var(--gold-500);
+  --color-gold-400: var(--gold-400);
+  --color-gold-200: var(--gold-200);
+  --font-display: var(--font-display);
+  --font-body:    var(--font-body);
+}
+
+html, body { background: var(--ivory-50); color: var(--ink-900); }
+body { font-family: var(--font-body); font-size: 16px; line-height: 1.55; }
+h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.02em; line-height: 1.1; }
+*:focus-visible { outline: 3px solid var(--gold-200); outline-offset: 2px; border-radius: 2px; }
