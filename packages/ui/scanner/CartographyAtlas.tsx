@@ -1,13 +1,23 @@
 "use client";
 import { useMemo } from "react";
 
+export interface AtlasZone {
+  x: number;        // 0–1
+  y: number;        // 0–1
+  radius: number;   // 0–1
+  intensity?: number;
+  region?: string;
+}
+
 interface Props {
-  /** Deterministic seed so the same upload yields the same map */
-  seed: number;
-  /** Count of detected pigmentation zones to render */
-  zones: number;
-  /** Fitzpatrick type — influences base luminance */
+  /** Skin type — influences base luminance */
   skin?: "I" | "II" | "III" | "IV" | "V" | "VI";
+  /** Explicit zones from Claude vision. If provided, used directly. */
+  zones?: AtlasZone[];
+  /** Fallback: random seed used when no zones provided */
+  seed?: number;
+  /** Fallback zone count when only a seed is given */
+  zoneCount?: number;
   preview?: boolean;
   scanning?: boolean;
   blurred?: boolean;
@@ -16,16 +26,29 @@ interface Props {
 /**
  * CartographyAtlas — an abstracted topographic rendering of pigmentation density.
  * Never the user's face. Concentric gold contour lines + density clusters,
- * placed deterministically by seed across a stylised facial region map.
- *
- * Visual language: late-19th-century cartography, but rendered in gold-on-black.
- * Reads as clinical-prestige rather than tech-demo.
+ * placed deterministically by seed or directly from Claude vision output.
  */
 export function CartographyAtlas({
-  seed, zones, skin = "III",
-  preview = false, scanning = false, blurred = false,
+  skin = "III",
+  zones,
+  seed = 42,
+  zoneCount = 9,
+  preview = false,
+  scanning = false,
+  blurred = false,
 }: Props) {
-  const clusters = useMemo(() => generateClusters(seed, zones), [seed, zones]);
+  const placedZones = useMemo(() => {
+    if (zones && zones.length > 0) {
+      return zones.map(z => ({
+        x: z.x * 400,
+        y: z.y * 500,
+        r: Math.max(8, Math.min(28, z.radius * 320)),
+        intensity: z.intensity ?? 0.8,
+      }));
+    }
+    return generateFallbackClusters(seed, zoneCount);
+  }, [zones, seed, zoneCount]);
+
   const luminance = skinToLuminance(skin);
 
   return (
@@ -69,27 +92,22 @@ export function CartographyAtlas({
       <rect width="400" height="500" fill="url(#dense-grid)" />
       <rect width="400" height="500" fill="url(#grain)" opacity="0.4" />
 
-      {/* Stylised facial region map — never a likeness, just oval contour topology */}
+      {/* Stylised facial region map — never a likeness */}
       <g stroke="#C9A65C" fill="none" strokeWidth="0.6" opacity="0.35">
-        {/* outer face contour */}
         <ellipse cx="200" cy="240" rx="125" ry="170" />
         <ellipse cx="200" cy="240" rx="105" ry="148" />
         <ellipse cx="200" cy="240" rx="82" ry="120" />
         <ellipse cx="200" cy="240" rx="56" ry="86" />
-        {/* eye lines */}
         <line x1="115" y1="195" x2="170" y2="195" />
         <line x1="230" y1="195" x2="285" y2="195" />
-        {/* nose ridge */}
         <line x1="200" y1="200" x2="200" y2="290" />
-        {/* mouth line */}
         <line x1="170" y1="320" x2="230" y2="320" />
-        {/* jaw ticks */}
         {[-1, 0, 1].map(i => (
           <line key={i} x1={185 + i * 15} y1={385} x2={185 + i * 15} y2={395} />
         ))}
       </g>
 
-      {/* Region label hairlines — read like a survey chart */}
+      {/* Region survey labels */}
       <g stroke="#C9A65C" strokeOpacity="0.35" strokeWidth="0.5" fill="#C9A65C" fillOpacity="0.7"
          fontFamily="DM Mono, monospace" fontSize="7" letterSpacing="1.5">
         <line x1="60" y1="170" x2="115" y2="195" />
@@ -108,20 +126,20 @@ export function CartographyAtlas({
 
       {/* Pigmentation density clusters */}
       <g>
-        {clusters.map((c, i) => (
+        {placedZones.map((z, i) => (
           <g key={i}>
             <circle
-              cx={c.x} cy={c.y} r={c.r}
+              cx={z.x} cy={z.y} r={z.r}
               fill="url(#cluster)"
+              opacity={0.4 + (z.intensity ?? 0.8) * 0.55}
               style={
                 scanning
                   ? { animation: `clusterReveal 0.6s ease-out ${i * 90}ms backwards` }
                   : undefined
               }
             />
-            {/* tiny index number, mono */}
             {!preview && !blurred && (
-              <text x={c.x + c.r + 3} y={c.y + 2}
+              <text x={z.x + z.r + 3} y={z.y + 2}
                     fill="#C9A65C" fillOpacity="0.7"
                     fontFamily="DM Mono, monospace" fontSize="6">
                 {String(i + 1).padStart(2, "0")}
@@ -154,24 +172,24 @@ export function CartographyAtlas({
   );
 }
 
-function generateClusters(seed: number, count: number) {
+function generateFallbackClusters(seed: number, count: number) {
   const rand = mulberry32(seed);
-  // Anatomically plausible pigment hotspots — malar zones, forehead, upper lip, chin
-  const zones: Array<[number, number, number]> = [
-    [150, 220, 24], [250, 220, 22], // upper malar
-    [140, 260, 28], [260, 260, 26], // lower malar
-    [200, 130, 18], [180, 110, 14], [220, 110, 14], // forehead
-    [200, 305, 16], // upper lip
-    [200, 380, 14], // chin
-    [170, 350, 12], [230, 350, 12], // jawline corners
+  const anatomicalHotspots: Array<[number, number, number]> = [
+    [150, 220, 24], [250, 220, 22],
+    [140, 260, 28], [260, 260, 26],
+    [200, 130, 18], [180, 110, 14], [220, 110, 14],
+    [200, 305, 16],
+    [200, 380, 14],
+    [170, 350, 12], [230, 350, 12],
   ];
 
-  return Array.from({ length: Math.min(count, zones.length) }).map((_, i) => {
-    const [zx, zy, zr] = zones[i];
+  return Array.from({ length: Math.min(count, anatomicalHotspots.length) }).map((_, i) => {
+    const [zx, zy, zr] = anatomicalHotspots[i];
     return {
       x: zx + (rand() - 0.5) * 18,
       y: zy + (rand() - 0.5) * 18,
       r: zr * (0.7 + rand() * 0.6),
+      intensity: 0.7,
     };
   });
 }
