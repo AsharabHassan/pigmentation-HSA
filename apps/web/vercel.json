@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    { "path": "/api/lead/retry", "schedule": "*/5 * * * *" }
+  ],
+  "regions": ["lhr1"]
+}
