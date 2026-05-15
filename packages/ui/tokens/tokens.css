@@ -1,40 +1,62 @@
 @layer tokens {
   :root {
-    /* INK — deep blacks (Harley Street Aesthetics: black + gold) */
-    --ink-900: #000000;
-    --ink-800: #0A0A0A;
-    --ink-700: #161616;
-    --ink-500: #4A4A4A;
-    --ink-400: #6B6B6B;
-    --ink-300: #9A9A9A;
+    /* SURFACE — warm cream */
+    --surface-50:  #FAF6EE;
+    --surface-100: #F2EBDD;
+    --surface-200: #E5DAC4;
+    --surface-900: #1A1612;
 
-    /* IVORY — kept for soft contrast on dark surfaces */
-    --ivory-50:  #FAF6F1;
-    --ivory-100: #F2EBE2;
-    --ivory-200: #E6DCCF;
+    /* INK — warm near-black */
+    --ink-900: #1A1612;
+    --ink-700: #3A3530;
+    --ink-500: #6B5F5B;
+    --ink-300: #B0A89E;
 
-    /* SURFACE — page + section backgrounds */
-    --surface-black:   #000000;
-    --surface-charcoal: #0F0F0F;
-    --surface-ash:      #1A1A1A;
+    /* CLAY — primary brand accent (antique gold)
+       Token name kept as "clay" for backwards-compat with every component
+       built before the gold pivot. Values are gold; the name is just a slot. */
+    --clay-50:  #FBF5E3;
+    --clay-100: #F4E8C8;
+    --clay-300: #D4B26A;
+    --clay-500: #B8964E;
+    --clay-600: #92732A;
+    --clay-700: #6D5520;
 
-    /* GOLD — primary accent */
-    --gold-300: #E6CB8F;
-    --gold-400: #D4B47A;
-    --gold-500: #C9A65C;   /* primary brand gold */
-    --gold-600: #B08A45;
-    --gold-700: #8C6B34;
+    /* MOSS — secondary accent (trust signals + clearance state) */
+    --moss-400: #8C9D6E;
+    --moss-500: #6B7A52;
+    --moss-700: #4A5638;
 
-    /* AUBERGINE — kept as legacy alias for sections that reference it
-       (mapped to deep charcoal so existing class names still resolve) */
-    --aubergine-900: #0F0F0F;
-    --aubergine-700: #1A1A1A;
+    /* AURUM — treatment-energy gold (mechanism section only — the laser) */
+    --aurum-200: #F3E2B8;
+    --aurum-400: #E6CB8F;
+    --aurum-500: #D4B26A;
+    --aurum-700: #A8853F;
+
+    /* LEGACY ALIASES — older components that haven't been refactored
+       still reference these. Map to the new palette so nothing renders
+       broken. Newer code should use the named clay/aurum/moss tokens. */
+    --ink-800: var(--ink-900);
+    --ink-400: var(--ink-500);
+    --ivory-50:  var(--surface-50);
+    --ivory-100: var(--surface-100);
+    --ivory-200: var(--surface-200);
+    --surface-black:    var(--surface-50);
+    --surface-charcoal: var(--surface-100);
+    --surface-ash:      var(--surface-200);
+    --gold-300: var(--clay-300);
+    --gold-400: var(--clay-300);
+    --gold-500: var(--clay-500);
+    --gold-600: var(--clay-600);
+    --gold-700: var(--clay-700);
+    --gold-200: var(--clay-100);
+    --aubergine-900: var(--surface-900);
+    --aubergine-700: var(--ink-900);
 
     /* FUNCTIONAL */
-    --clinical-blue-500: #4A6B7D;
-    --success-500: #5B7A52;
-    --warn-500:    #B8763A;
-    --error-500:   #B85A4A;
+    --success-500: var(--moss-500);
+    --warn-500:    #C77D3B;
+    --error-500:   #B0392B;
 
     /* SPACING */
     --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
@@ -56,8 +78,8 @@
     --ease-soft:   cubic-bezier(0.4, 0, 0.2, 1);
 
     /* TYPE */
-    --font-display: "Cormorant Garamond", "Times New Roman", Georgia, serif;
-    --font-body:    "DM Sans", -apple-system, "Segoe UI", sans-serif;
+    --font-display: "Spectral", "Times New Roman", Georgia, serif;
+    --font-body:    "Manrope", -apple-system, "Segoe UI", sans-serif;
     --font-mono:    "DM Mono", "SF Mono", Consolas, monospace;
   }
 

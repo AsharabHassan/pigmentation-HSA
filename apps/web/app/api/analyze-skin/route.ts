@@ -1,11 +1,14 @@
-import { analyzeSkin, type SkinAnalysis } from "@lib/anthropic/analyze-skin";
+import { analyzeSkin, type SkinAnalysis, type Treatment } from "@lib/anthropic/analyze-skin";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
+const TREATMENTS: readonly Treatment[] = ["pigmentation", "chemical-peel", "skin-glow-drip"] as const;
+
 interface RequestBody {
   imageBase64?: string;
   mediaType?: "image/jpeg" | "image/png" | "image/webp";
+  treatment?: Treatment;
 }
 
 export async function POST(req: Request): Promise<Response> {
@@ -17,13 +20,15 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   const { imageBase64, mediaType } = body;
+  const treatment: Treatment =
+    body.treatment && TREATMENTS.includes(body.treatment) ? body.treatment : "pigmentation";
+
   if (!imageBase64 || !mediaType) {
     return json(400, { ok: false, error: "imageBase64 and mediaType are required" });
   }
   if (!["image/jpeg", "image/png", "image/webp"].includes(mediaType)) {
     return json(400, { ok: false, error: "Unsupported media type" });
   }
-  // Reject anything over ~8MB after base64 inflation
   if (imageBase64.length > 11_000_000) {
     return json(413, { ok: false, error: "Image too large (max 8MB)" });
   }
@@ -34,7 +39,7 @@ export async function POST(req: Request): Promise<Response> {
   }
 
   try {
-    const analysis = await analyzeSkin({ imageBase64, mediaType });
+    const analysis = await analyzeSkin({ imageBase64, mediaType, treatment });
     if (!analysis) {
       return json(200, { ok: true, analysis: fallbackAnalysis() });
     }

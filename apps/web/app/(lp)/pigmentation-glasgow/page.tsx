@@ -5,11 +5,12 @@ import { ConcernCards } from "@ui/sections/ConcernCards";
 import { DoctorSection } from "@ui/sections/DoctorSection";
 import { Testimonials } from "@ui/sections/Testimonials";
 import { PricingCards } from "@ui/sections/PricingCards";
+import { FinancingSection } from "@ui/sections/FinancingSection";
 import { FAQ } from "@ui/sections/FAQ";
 
 import { hero } from "@content/pigmentation/hero";
-import { doctor } from "@content/pigmentation/doctor";
-import { testimonials } from "@content/pigmentation/testimonials";
+import { team } from "@content/pigmentation/doctor";
+import { testimonialsGlasgow as testimonials } from "@content/pigmentation/testimonials";
 import { timelineStages } from "@content/pigmentation/timeline";
 import { faqOnPage } from "@content/pigmentation/faq-on-page";
 
@@ -42,9 +43,10 @@ export default function PigmentationLpPage() {
       <ClientSelfieScanner />
       <ClientMechanismAnimation />
       <ClientTimelineScrubber stages={timelineStages} />
-      <DoctorSection {...doctor} />
+      <DoctorSection doctors={team} />
       <Testimonials items={testimonials} />
       <PricingCards />
+      <FinancingSection />
       <ClientBookingSection />
       <FAQ
         heading="Frequently asked"

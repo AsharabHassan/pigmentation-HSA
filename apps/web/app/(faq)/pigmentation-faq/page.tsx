@@ -8,7 +8,7 @@ import { buildFaqJsonLd } from "@lib/schema/faq-jsonld";
 import {
   buildMedicalPageJsonLd, buildBreadcrumbJsonLd,
 } from "@lib/schema/medical-page-jsonld";
-import { doctor } from "@content/pigmentation/doctor";
+import { drAyda } from "@content/team";
 
 const PAGE_URL = "https://harleystreetmedics.clinic/pigmentation-faq";
 const LAST_REVIEWED = "2026-05-13";
@@ -16,7 +16,7 @@ const LAST_REVIEWED = "2026-05-13";
 export const metadata: Metadata = {
   title: "Pigmentation Treatment Glasgow — Every Question, Answered",
   description:
-    "Comprehensive answers about pigmentation, melasma, sun damage, post-acne marks, lip pigmentation, and treatment in our Glasgow clinic. Medically reviewed by Dr. M.T. Ahmad.",
+    "Comprehensive answers about pigmentation, melasma, sun damage, post-acne marks, lip pigmentation, and treatment in our Glasgow clinic. Medically reviewed by Dr. Ayda Soltanzadeh.",
   alternates: { canonical: "/pigmentation-faq" },
 };
 
@@ -27,7 +27,7 @@ export default function PigmentationFaqPage() {
     name: "Pigmentation Treatment in Glasgow — Every Question, Answered",
     description:
       "Comprehensive answers about pigmentation, melasma, treatment options, costs, and aftercare at our Glasgow clinic.",
-    reviewer: { name: doctor.name, jobTitle: "Aesthetic Physician" },
+    reviewer: { name: drAyda.name, jobTitle: "Aesthetic Physician" },
     lastReviewed: LAST_REVIEWED,
     medicalSpecialty: "Dermatology",
   });
@@ -52,7 +52,7 @@ export default function PigmentationFaqPage() {
             Pigmentation Treatment in Glasgow — Every Question, Answered
           </h1>
           <p className="mt-6 max-w-3xl text-lg text-ivory-100/85 leading-relaxed">
-            A reference written and reviewed by Dr. M.T. Ahmad. Whether you&apos;re researching melasma, sun damage,
+            A reference written and reviewed by Dr. Ayda Soltanzadeh. Whether you&apos;re researching melasma, sun damage,
             post-acne marks, or treatment options for darker skin types — the most common questions are answered
             here in full. If you want a personalised plan instead,{" "}
             <Link href="/pigmentation-glasgow#quiz" className="underline decoration-gold-500 underline-offset-4 hover:text-gold-400">
@@ -60,7 +60,7 @@ export default function PigmentationFaqPage() {
             </Link>.
           </p>
           <p className="mt-6 text-sm text-ivory-100/60">
-            Reviewed by <strong>{doctor.name}</strong> · Last reviewed {LAST_REVIEWED}
+            Reviewed by <strong>{drAyda.name}</strong> · Last reviewed {LAST_REVIEWED}
           </p>
         </Container>
       </Section>

@@ -43,13 +43,13 @@ export function BookingSection({ calendarUrl = FALLBACK_URL }: Props) {
               that works.
             </h2>
             <p className="mt-6 text-base md:text-lg text-ink-700 max-w-md leading-relaxed">
-              Sixty minutes with Dr. Ahmad over video. He&apos;ll review your skin, walk you through the protocol options, and share a transparent price. No card, no pressure, no upsell.
+              Ten focused minutes with the Harley Street Medics team over video. We&apos;ll review your skin, walk you through the protocol options, and share a transparent price. No card, no pressure, no upsell.
             </p>
 
             <ul className="mt-8 space-y-4 text-sm text-ink-700">
               <li className="flex items-start gap-3">
                 <Clock size={18} className="text-clay-500 mt-0.5 shrink-0" aria-hidden />
-                <span><strong className="text-ink-900">60 minutes</strong> · online via secure video link</span>
+                <span><strong className="text-ink-900">10 minutes</strong> · online via secure video link</span>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin size={18} className="text-clay-500 mt-0.5 shrink-0" aria-hidden />
@@ -102,7 +102,7 @@ function CalendarPlaceholder() {
       </p>
       <a
         href="mailto:bookings@harleystreetmedics.clinic?subject=Consultation%20Request"
-        className="mt-8 inline-flex items-center bg-clay-500 text-surface-50 px-6 py-3
+        className="mt-8 inline-flex items-center bg-clay-500 text-ink-900 px-6 py-3
                    text-[12px] uppercase tracking-[0.12em] font-semibold rounded-full
                    hover:bg-clay-600 transition-colors"
       >

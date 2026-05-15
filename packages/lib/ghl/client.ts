@@ -49,3 +49,22 @@ export async function ghlUpsertContact(contact: GhlContact): Promise<GhlResult> 
     return { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
 }
+
+export async function ghlSubmitWebhook(payload: Record<string, unknown>, webhookUrl: string): Promise<GhlResult> {
+  try {
+    const res = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(5000),
+    });
+
+    if (!res.ok) return { ok: false, status: res.status };
+    return { ok: true, status: res.status };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+}

@@ -33,6 +33,12 @@
   --color-moss-500: var(--moss-500);
   --color-moss-700: var(--moss-700);
 
+  /* Aurum (treatment-energy gold — mechanism section only) */
+  --color-aurum-200: var(--aurum-200);
+  --color-aurum-400: var(--aurum-400);
+  --color-aurum-500: var(--aurum-500);
+  --color-aurum-700: var(--aurum-700);
+
   /* Legacy aliases for unrefactored components — map to new palette */
   --color-ivory-50:  var(--surface-50);
   --color-ivory-100: var(--surface-100);

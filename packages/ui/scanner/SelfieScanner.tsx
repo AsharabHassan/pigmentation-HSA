@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { Container } from "../primitives/Container";
@@ -9,7 +9,7 @@ import { Input } from "../primitives/Input";
 import { Camera, Upload, Lock, RotateCcw, ShieldCheck, Sparkles } from "lucide-react";
 import { CartographyAtlas, type AtlasZone } from "./CartographyAtlas";
 
-type Phase = "idle" | "preview" | "scanning" | "gate" | "revealed" | "error";
+type Phase = "idle" | "camera" | "preview" | "scanning" | "gate" | "revealed" | "error";
 
 interface SkinZone {
   region: string;
@@ -38,7 +38,27 @@ const CONCERN_LABEL: Record<string, string> = {
   "none-detected": "No visible pigmentation",
 };
 
-export function SelfieScanner() {
+export type TreatmentContext = "pigmentation" | "chemical-peel" | "skin-glow-drip";
+
+interface SelfieScannerProps {
+  sectionId?: string;
+  sectionKicker?: string;
+  headlineMain?: string;
+  headlineAccent?: string;
+  intro?: string;
+  treatment?: TreatmentContext;
+  leadSource?: string;
+}
+
+export function SelfieScanner({
+  sectionId = "skin-scan",
+  sectionKicker = "AI skin scan · free",
+  headlineMain = "See what's happening",
+  headlineAccent = "on your skin.",
+  intro = "Upload a clear selfie. Our AI maps your pigmentation pattern and matches a protocol. Takes about 5 seconds.",
+  treatment = "pigmentation",
+  leadSource = "lp-pigmentation-scanner",
+}: SelfieScannerProps = {}) {
   const [phase, setPhase] = useState<Phase>("idle");
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<SkinAnalysis | null>(null);
@@ -61,7 +81,7 @@ export function SelfieScanner() {
       const [res] = await Promise.all([
         fetch("/api/analyze-skin", {
           method: "POST", headers: { "content-type": "application/json" },
-          body: JSON.stringify({ imageBase64: base64, mediaType }),
+          body: JSON.stringify({ imageBase64: base64, mediaType, treatment }),
         }),
         new Promise(r => setTimeout(r, 2200)),
       ]);
@@ -84,30 +104,29 @@ export function SelfieScanner() {
   };
 
   return (
-    <section id="pigmentation-map" className="bg-surface-100 py-20 md:py-28">
+    <section id={sectionId} className="bg-surface-100 py-20 md:py-28">
       <Container width="wide">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em] text-clay-500 font-semibold mb-3 flex items-center gap-2">
               <Sparkles size={14} className="text-clay-500" aria-hidden />
-              AI skin scan · free
+              {sectionKicker}
             </p>
             <h2 className="font-display text-4xl md:text-6xl text-ink-900 leading-[1.05] max-w-3xl">
-              See what&apos;s happening<br />
-              <span className="text-clay-600">on your skin.</span>
+              {headlineMain}<br />
+              <span className="text-clay-600">{headlineAccent}</span>
             </h2>
           </div>
-          <p className="text-base text-ink-700 max-w-sm">
-            Upload a clear selfie. Our AI maps your pigmentation pattern and matches a protocol. Takes about 5 seconds.
-          </p>
+          <p className="text-base text-ink-700 max-w-sm">{intro}</p>
         </div>
 
         <div>
-          {phase === "idle"     && <IdleState onFile={handleFile} />}
+          {phase === "idle"     && <IdleState onFile={handleFile} onUseCamera={() => setPhase("camera")} />}
+          {phase === "camera"   && <CameraState onCapture={handleFile} onCancel={() => setPhase("idle")} />}
           {phase === "preview"  && imgUrl && <PreviewState imgUrl={imgUrl} onStart={startScan} onReset={reset} />}
           {phase === "scanning" && imgUrl && <ScanningState imgUrl={imgUrl} />}
           {phase === "gate"     && analysis && (
-            <LeadGateState analysis={analysis} onUnlock={() => setPhase("revealed")} onReset={reset} />
+            <LeadGateState analysis={analysis} leadSource={leadSource} onUnlock={() => setPhase("revealed")} onReset={reset} />
           )}
           {phase === "revealed" && analysis && <RevealedState analysis={analysis} onReset={reset} />}
           {phase === "error"    && <ErrorState message={error ?? "Something went wrong"} onReset={reset} />}
@@ -128,7 +147,7 @@ export function SelfieScanner() {
   );
 }
 
-function IdleState({ onFile }: { onFile: (f: File) => void }) {
+function IdleState({ onFile, onUseCamera }: { onFile: (f: File) => void; onUseCamera: () => void }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-[55%_45%] gap-10 items-center">
       <div className="rounded-2xl overflow-hidden border border-surface-200 bg-surface-50 aspect-[4/5]">
@@ -145,7 +164,7 @@ function IdleState({ onFile }: { onFile: (f: File) => void }) {
         <label className="mt-7 group block cursor-pointer">
           <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only"
                  onChange={e => e.target.files?.[0] && onFile(e.target.files[0])} />
-          <span className="flex items-center justify-between gap-4 bg-clay-500 text-surface-50 px-6 py-4
+          <span className="flex items-center justify-between gap-4 bg-clay-500 text-ink-900 px-6 py-4
                            rounded-full group-hover:bg-clay-600 transition-colors">
             <span className="flex items-center gap-3">
               <Upload size={18} aria-hidden />
@@ -155,16 +174,184 @@ function IdleState({ onFile }: { onFile: (f: File) => void }) {
           </span>
         </label>
 
-        <div className="mt-3 flex items-center justify-between gap-4 border border-surface-200 px-6 py-4 rounded-full opacity-40">
+        <button
+          type="button"
+          onClick={onUseCamera}
+          className="mt-3 group flex items-center justify-between gap-4 w-full border border-surface-200
+                     px-6 py-4 rounded-full hover:border-clay-500 hover:bg-surface-50 transition-colors"
+        >
           <span className="flex items-center gap-3">
-            <Camera size={18} className="text-ink-500" aria-hidden />
-            <span className="text-[13px] uppercase tracking-[0.12em] text-ink-500 font-semibold">Use webcam</span>
+            <Camera size={18} className="text-ink-700 group-hover:text-clay-600 transition-colors" aria-hidden />
+            <span className="text-[13px] uppercase tracking-[0.12em] text-ink-700 group-hover:text-clay-700 font-semibold transition-colors">
+              Use webcam
+            </span>
           </span>
-          <span className="text-[11px] uppercase tracking-[0.1em] text-ink-500">Coming soon</span>
-        </div>
+          <span className="text-[11px] uppercase tracking-[0.1em] text-ink-500">Live capture</span>
+        </button>
 
         <p className="mt-6 text-xs text-ink-500 leading-relaxed">
           Image is sent to our secure server for analysis, then discarded. We never store or share it.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function CameraState({ onCapture, onCancel }: {
+  onCapture: (f: File) => void;
+  onCancel: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [ready, setReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [capturing, setCapturing] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+        setError("Your browser does not support camera capture. Try uploading a photo instead.");
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 1280 } },
+          audio: false,
+        });
+        if (cancelled) {
+          stream.getTracks().forEach(t => t.stop());
+          return;
+        }
+        streamRef.current = stream;
+        const v = videoRef.current;
+        if (v) {
+          v.srcObject = stream;
+          await v.play().catch(() => {});
+          setReady(true);
+        }
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        if (/NotAllowed|Permission/i.test(msg)) {
+          setError("Camera permission was blocked. Allow access in your browser settings, or upload a photo instead.");
+        } else if (/NotFound/i.test(msg)) {
+          setError("No camera was found on this device. Try uploading a photo instead.");
+        } else {
+          setError("Could not start your camera. Try uploading a photo instead.");
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+      streamRef.current?.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    };
+  }, []);
+
+  const capture = async () => {
+    const v = videoRef.current;
+    if (!v || !ready || capturing) return;
+    setCapturing(true);
+    try {
+      const w = v.videoWidth;
+      const h = v.videoHeight;
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas unavailable");
+      ctx.drawImage(v, 0, 0, w, h);
+      const blob: Blob = await new Promise((resolve, reject) => {
+        canvas.toBlob(b => (b ? resolve(b) : reject(new Error("Could not encode capture"))), "image/jpeg", 0.92);
+      });
+      streamRef.current?.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+      const file = new File([blob], `selfie-${Date.now()}.jpg`, { type: "image/jpeg" });
+      onCapture(file);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not capture image");
+      setCapturing(false);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-[55%_45%] gap-10 items-start">
+      <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-surface-200 bg-ink-900">
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover [transform:scaleX(-1)]"
+        />
+        {!ready && !error && (
+          <div className="absolute inset-0 flex items-center justify-center text-surface-50/80 text-[12px] uppercase tracking-[0.14em]">
+            Starting camera…
+          </div>
+        )}
+        {ready && (
+          <>
+            <div aria-hidden className="absolute inset-0 pointer-events-none flex items-center justify-center">
+              <div className="w-[68%] h-[82%] rounded-[50%] border-2 border-surface-50/40
+                              shadow-[0_0_0_9999px_rgba(26,22,18,0.35)]" />
+            </div>
+            <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-clay-500 text-ink-900
+                            px-2.5 py-1 rounded-full text-[11px] uppercase tracking-[0.14em] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-ink-900 animate-pulse" /> Live
+            </div>
+            <div className="absolute bottom-4 left-4 right-4 text-center
+                            bg-surface-50/95 text-ink-900 text-[11px] uppercase tracking-[0.14em]
+                            px-3 py-1.5 rounded-full font-semibold">
+              Centre your face · look straight ahead
+            </div>
+          </>
+        )}
+      </div>
+
+      <div>
+        <h3 className="font-display text-3xl md:text-4xl text-ink-900 leading-tight">
+          Frame your face in the oval.
+        </h3>
+        <p className="mt-4 text-ink-700 leading-relaxed">
+          Even, natural light works best — avoid harsh overhead shadows or backlight from a window. The capture stays in your browser until you choose to analyse.
+        </p>
+
+        {error && (
+          <div className="mt-7 bg-surface-50 border border-error-500/30 rounded-xl p-4">
+            <p className="text-sm text-ink-900 font-semibold">Camera unavailable</p>
+            <p className="mt-1 text-sm text-ink-700 leading-relaxed">{error}</p>
+          </div>
+        )}
+
+        <div className="mt-7 flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={capture}
+            disabled={!ready || capturing || !!error}
+            className="flex items-center justify-between gap-4 w-full bg-clay-500 text-ink-900 px-6 py-4
+                       rounded-full hover:bg-clay-600 transition-colors
+                       disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <span className="flex items-center gap-3">
+              <Camera size={18} aria-hidden />
+              <span className="text-[13px] uppercase tracking-[0.12em] font-semibold">
+                {capturing ? "Capturing…" : "Capture selfie"}
+              </span>
+            </span>
+            <span className="text-[11px] uppercase tracking-[0.1em] opacity-70">Front camera</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onCancel}
+            className="self-start flex items-center gap-2 text-sm text-ink-500 hover:text-clay-600"
+          >
+            <RotateCcw size={14} aria-hidden /> Cancel · upload a file instead
+          </button>
+        </div>
+
+        <p className="mt-6 text-xs text-ink-500 leading-relaxed">
+          Image stays in your browser until you tap analyse, then is sent securely for one-time analysis and discarded.
         </p>
       </div>
     </div>
@@ -194,7 +381,7 @@ function PreviewState({ imgUrl, onStart, onReset }: {
 
         <button type="button" onClick={onStart}
           className="mt-7 group flex items-center justify-between gap-4 w-full
-                     bg-clay-500 text-surface-50 px-6 py-4 rounded-full
+                     bg-clay-500 text-ink-900 px-6 py-4 rounded-full
                      hover:bg-clay-600 transition-colors">
           <span className="text-[13px] uppercase tracking-[0.12em] font-semibold">Analyse with AI</span>
           <span className="text-[11px] uppercase tracking-[0.1em] opacity-70">~5 sec</span>
@@ -221,7 +408,7 @@ function ScanningState({ imgUrl }: { imgUrl: string }) {
         <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between
                         text-[11px] uppercase tracking-[0.14em] font-semibold">
           <span className="bg-surface-50/95 text-ink-900 px-2.5 py-1 rounded-full">Analysing…</span>
-          <span className="flex items-center gap-1.5 bg-clay-500 text-surface-50 px-2.5 py-1 rounded-full">
+          <span className="flex items-center gap-1.5 bg-clay-500 text-ink-900 px-2.5 py-1 rounded-full">
             <span className="w-1.5 h-1.5 rounded-full bg-surface-50 animate-pulse" /> Live
           </span>
         </div>
@@ -261,14 +448,15 @@ interface LeadFormFields {
   marketingConsent: boolean;
 }
 
-function LeadGateState({ analysis, onUnlock, onReset }: {
-  analysis: SkinAnalysis; onUnlock: () => void; onReset: () => void;
+function LeadGateState({ analysis, leadSource, onUnlock, onReset }: {
+  analysis: SkinAnalysis; leadSource: string; onUnlock: () => void; onReset: () => void;
 }) {
   const { register, handleSubmit, formState: { isValid, isSubmitting }, watch } = useForm<LeadFormFields>({
     mode: "onChange",
     defaultValues: { phoneCountry: "GB", consent: false, marketingConsent: false },
   });
   const [serverError, setServerError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const consentChecked = watch("consent");
 
   const atlasZones: AtlasZone[] = analysis.zones.map(z => ({
@@ -285,7 +473,7 @@ function LeadGateState({ analysis, onUnlock, onReset }: {
           fullName: form.fullName, email: form.email,
           rawPhone: form.phone, phoneCountry: form.phoneCountry,
           consent: form.consent, marketingConsent: form.marketingConsent,
-          source: "lp-pigmentation-scanner",
+          source: leadSource,
           quiz: {
             primary_concern: mapConcernToQuiz(analysis.dominant_concern),
             duration: "years", fitzpatrick: analysis.fitzpatrick,
@@ -298,14 +486,19 @@ function LeadGateState({ analysis, onUnlock, onReset }: {
       });
       const data = await res.json();
       if (!res.ok || !data.ok) {
-        const msg = data?.fieldErrors
-          ? Object.values(data.fieldErrors).join(" · ")
-          : data?.error || `Server error ${res.status}`;
-        throw new Error(msg);
+        if (data?.fieldErrors && typeof data.fieldErrors === "object") {
+          setFieldErrors(data.fieldErrors as Record<string, string>);
+          throw new Error("Please check the highlighted fields and try again.");
+        }
+        throw new Error(data?.error || `Server error ${res.status} — please try again or call the clinic.`);
       }
       onUnlock();
     } catch (e) {
       setServerError(e instanceof Error ? e.message : "Could not unlock report");
+      // scroll the form into view so the user sees the error banner
+      if (typeof window !== "undefined") {
+        document.getElementById("scanner-form-error")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     }
   };
 
@@ -341,14 +534,47 @@ function LeadGateState({ analysis, onUnlock, onReset }: {
           Where should we send it?
         </h3>
         <p className="mt-3 text-ink-700 leading-relaxed">
-          Your atlas, recommended protocol, and a link to book a free online consultation with Dr. Ahmad.
+          Your atlas, recommended protocol, and a link to book a free 10-minute consultation with the Harley Street Medics team.
         </p>
 
+        {serverError && (
+          <div
+            id="scanner-form-error"
+            role="alert"
+            aria-live="assertive"
+            className="mt-6 rounded-xl border-2 border-error-500 bg-error-500/10 px-4 py-3.5 text-sm"
+          >
+            <p className="font-semibold text-error-500 flex items-center gap-2">
+              <span aria-hidden>⚠</span> {serverError}
+            </p>
+            {Object.keys(fieldErrors).length > 0 && (
+              <ul className="mt-2 ml-6 list-disc text-ink-900 leading-relaxed space-y-1">
+                {Object.entries(fieldErrors).map(([field, msg]) => (
+                  <li key={field}>
+                    <span className="font-semibold capitalize">{field}:</span> {msg}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
         <div className="mt-7 flex flex-col gap-4">
-          <Input id="scanner-name" label="Full name *" autoComplete="name"
-                 {...register("fullName", { required: true, minLength: 2 })} />
-          <Input id="scanner-email" label="Email *" type="email" autoComplete="email"
-                 {...register("email", { required: true, pattern: /^[^@\s]+@[^@\s]+\.[^@\s]+$/ })} />
+          <Input
+            id="scanner-name"
+            label="Full name *"
+            autoComplete="name"
+            error={fieldErrors.fullName}
+            {...register("fullName", { required: true, minLength: 2 })}
+          />
+          <Input
+            id="scanner-email"
+            label="Email *"
+            type="email"
+            autoComplete="email"
+            error={fieldErrors.email}
+            {...register("email", { required: true, pattern: /^[^@\s]+@[^@\s]+\.[^@\s]+$/ })}
+          />
           <div className="grid grid-cols-[110px_1fr] gap-3">
             <div>
               <label htmlFor="scanner-country" className="block text-xs uppercase tracking-[0.12em] text-ink-500 mb-2 font-semibold">
@@ -367,7 +593,8 @@ function LeadGateState({ analysis, onUnlock, onReset }: {
               </select>
             </div>
             <Input id="scanner-phone" label="Mobile *" type="tel" autoComplete="tel"
-                   helpText="We'll text you a booking link"
+                   helpText={fieldErrors.phone ?? "We'll text you a booking link"}
+                   error={fieldErrors.phone}
                    {...register("phone", { required: true, minLength: 7 })} />
           </div>
 
@@ -380,10 +607,8 @@ function LeadGateState({ analysis, onUnlock, onReset }: {
             <span>Send me occasional skincare tips. (Optional)</span>
           </label>
 
-          {serverError && <p className="text-sm text-error-500">{serverError}</p>}
-
           <button type="submit" disabled={!isValid || !consentChecked || isSubmitting}
-            className="mt-2 inline-flex items-center justify-between gap-3 bg-clay-500 text-surface-50 px-6 py-4
+            className="mt-2 inline-flex items-center justify-between gap-3 bg-clay-500 text-ink-900 px-6 py-4
                        rounded-full text-[13px] uppercase tracking-[0.12em] font-semibold
                        hover:bg-clay-600 transition-colors
                        disabled:opacity-40 disabled:cursor-not-allowed">
@@ -440,7 +665,7 @@ function RevealedState({ analysis, onReset }: { analysis: SkinAnalysis; onReset:
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
           <Link href="#book"
-            className="inline-flex items-center justify-center gap-2 bg-clay-500 text-surface-50 px-6 py-4
+            className="inline-flex items-center justify-center gap-2 bg-clay-500 text-ink-900 px-6 py-4
                        rounded-full text-[13px] uppercase tracking-[0.12em] font-semibold
                        hover:bg-clay-600 transition-colors">
             Book free consultation →
@@ -464,7 +689,7 @@ function ErrorState({ message, onReset }: { message: string; onReset: () => void
       <h3 className="mt-3 font-display text-3xl text-ink-900">Let&apos;s try a different photo.</h3>
       <p className="mt-3 text-ink-700">{message}</p>
       <button type="button" onClick={onReset}
-        className="mt-6 inline-flex items-center gap-2 bg-clay-500 text-surface-50 px-5 py-3
+        className="mt-6 inline-flex items-center gap-2 bg-clay-500 text-ink-900 px-5 py-3
                    rounded-full text-[13px] uppercase tracking-[0.12em] font-semibold hover:bg-clay-600 transition-colors">
         <RotateCcw size={14} aria-hidden /> Start over
       </button>

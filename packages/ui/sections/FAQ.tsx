@@ -1,6 +1,7 @@
 "use client";
 import { useId, useState, type ReactNode } from "react";
-import { Plus, Minus } from "lucide-react";
+import Link from "next/link";
+import { Plus, Minus, CalendarCheck } from "lucide-react";
 import { Container } from "../primitives/Container";
 import { buildFaqJsonLd, type FaqEntry } from "@lib/schema/faq-jsonld";
 
@@ -55,6 +56,22 @@ export function FAQ({ heading, entries, id = "faq" }: Props) {
             </Item>
           ))}
         </div>
+
+        <div className="mt-12 md:mt-16 text-center max-w-2xl mx-auto">
+          <p className="text-ink-700 leading-relaxed">
+            Still have questions? The fastest path is ten focused minutes with the team.
+          </p>
+          <Link
+            href={"#book" as never}
+            className="mt-5 inline-flex items-center gap-2 bg-clay-500 text-ink-900
+                       px-6 py-3.5 rounded-full text-[12px] uppercase tracking-[0.12em] font-semibold
+                       hover:bg-clay-600 transition-colors"
+          >
+            <CalendarCheck size={15} aria-hidden />
+            Book your free 10-min consultation →
+          </Link>
+        </div>
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}

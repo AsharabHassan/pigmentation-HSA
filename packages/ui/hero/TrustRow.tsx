@@ -17,7 +17,7 @@ export function TrustRow({ rating, reviewCount }: Props) {
       </span>
       <span className="h-1 w-1 rounded-full bg-gold-500/40" />
       <span className="text-xs uppercase tracking-[0.18em] text-gold-500">GMC ✓</span>
-      <span className="text-xs uppercase tracking-[0.18em] text-gold-500">CQC ✓</span>
+      <span className="text-xs uppercase tracking-[0.18em] text-gold-500">CQC Registered ✓</span>
       <span className="text-xs uppercase tracking-[0.18em] text-gold-500">Harley St-trained</span>
     </div>
   );

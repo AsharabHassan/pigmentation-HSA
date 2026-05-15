@@ -20,7 +20,7 @@ export function StickyMobileCTA({ label, href }: { label: string; href: string }
     >
       <Link
         href={href as never}
-        className="block w-full text-center bg-clay-500 text-surface-50 px-5 py-3.5
+        className="block w-full text-center bg-clay-500 text-ink-900 px-5 py-3.5
                    text-sm uppercase tracking-[0.1em] font-semibold rounded-full"
       >
         {label}

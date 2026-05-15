@@ -37,7 +37,6 @@ export default function Preview() {
 
           <div className="flex gap-3 mb-10">
             <Pill>GMC ✓</Pill>
-            <Pill>CQC ✓</Pill>
             <Pill>4.9★</Pill>
           </div>
 

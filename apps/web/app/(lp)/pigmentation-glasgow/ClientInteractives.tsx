@@ -20,7 +20,7 @@ const BookingSection = dynamic(
 );
 
 export function ClientSelfieScanner() {
-  return <SelfieScanner />;
+  return <SelfieScanner leadSource="lp-pigmentation-glasgow-scanner" />;
 }
 export function ClientMechanismAnimation() {
   return <MechanismAnimation />;

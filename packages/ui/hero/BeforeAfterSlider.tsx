@@ -112,7 +112,7 @@ export function BeforeAfterSlider({
           {beforeLabel}
         </span>
         <span className="absolute top-4 right-4 z-10 text-[11px] uppercase tracking-[0.14em]
-                         text-surface-50 bg-clay-500 px-2.5 py-1 rounded-full font-semibold">
+                         text-ink-900 bg-clay-500 px-2.5 py-1 rounded-full font-semibold">
           {afterLabel}
         </span>
 

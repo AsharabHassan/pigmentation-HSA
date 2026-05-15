@@ -4,11 +4,28 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { Container } from "../primitives/Container";
 
-const tiers = [
+export interface PricingTier {
+  name: string;
+  price: string;
+  cadence: string;
+  features: string[];
+  cta: { label: string; href: string };
+  featured?: boolean;
+}
+
+interface Props {
+  sectionId?: string;
+  sectionKicker?: string;
+  headline?: string;
+  intro?: string;
+  tiers?: PricingTier[];
+}
+
+const DEFAULT_TIERS: PricingTier[] = [
   {
     name: "Free consultation",
     price: "£0",
-    cadence: "60 minutes · online",
+    cadence: "10 minutes · online",
     features: [
       "Dermatological skin analysis",
       "Personalised treatment plan",
@@ -45,23 +62,31 @@ const tiers = [
   },
 ];
 
-export function PricingCards() {
+export function PricingCards({
+  sectionId = "pricing",
+  sectionKicker = "Pricing",
+  headline = "No hidden fees.",
+  intro = "Klarna and split-payment available. Final pricing confirmed at your free consultation.",
+  tiers = DEFAULT_TIERS,
+}: Props = {}) {
   return (
-    <section id="pricing" className="bg-surface-100 py-20 md:py-28">
+    <section id={sectionId} className="bg-surface-100 py-20 md:py-28">
       <Container width="wide">
         <div className="text-center mb-12 md:mb-16 max-w-2xl mx-auto">
           <p className="text-[11px] uppercase tracking-[0.18em] text-clay-500 font-semibold mb-3">
-            Pricing
+            {sectionKicker}
           </p>
           <h2 className="font-display text-4xl md:text-6xl text-ink-900 leading-[1.05]">
-            No hidden fees.
+            {headline}
           </h2>
-          <p className="mt-5 text-base md:text-lg text-ink-700">
-            Klarna and split-payment available. Final pricing confirmed at your free consultation.
-          </p>
+          <p className="mt-5 text-base md:text-lg text-ink-700">{intro}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 max-w-5xl mx-auto">
+        <div className={`grid grid-cols-1 gap-5 md:gap-6 mx-auto ${
+          tiers.length >= 4
+            ? "md:grid-cols-2 lg:grid-cols-4 max-w-6xl"
+            : "md:grid-cols-3 max-w-5xl"
+        }`}>
           {tiers.map((t, i) => (
             <motion.article
               key={t.name}
@@ -71,12 +96,12 @@ export function PricingCards() {
               transition={{ duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
               className={
                 t.featured
-                  ? "relative bg-ink-900 text-surface-50 rounded-2xl p-8 md:p-10 order-first md:order-none md:scale-[1.04] shadow-[0_20px_60px_-20px_rgba(26,22,18,0.3)]"
-                  : "relative bg-surface-50 rounded-2xl p-8 md:p-10 border border-surface-200"
+                  ? `relative bg-ink-900 text-surface-50 rounded-2xl p-7 md:p-9 order-first md:order-none ${tiers.length < 4 ? "md:scale-[1.04]" : ""} shadow-[0_20px_60px_-20px_rgba(26,22,18,0.3)]`
+                  : "relative bg-surface-50 rounded-2xl p-7 md:p-9 border border-surface-200"
               }
             >
               {t.featured && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-clay-500 text-surface-50
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-clay-500 text-ink-900
                                  text-[10px] uppercase tracking-[0.18em] font-semibold
                                  px-4 py-1.5 rounded-full">
                   Most chosen
@@ -104,7 +129,7 @@ export function PricingCards() {
                 className={`mt-8 inline-flex items-center justify-center w-full px-6 py-3.5
                             text-[12px] uppercase tracking-[0.12em] font-semibold rounded-full transition-colors ${
                   t.featured
-                    ? "bg-clay-500 text-surface-50 hover:bg-clay-600"
+                    ? "bg-clay-500 text-ink-900 hover:bg-clay-600"
                     : "bg-ink-900 text-surface-50 hover:bg-ink-700"
                 }`}
               >

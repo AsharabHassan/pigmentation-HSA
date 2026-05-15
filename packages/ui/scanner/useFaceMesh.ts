@@ -13,7 +13,7 @@ export interface ScanResult {
  * derive a plausible zone count. Always succeeds within ~1s.
  *
  * (The "atlas" rendered for the user is intentionally not a likeness of their
- * face. This is a visualisation, not a diagnosis — Dr. Ahmad confirms in clinic.)
+ * face. This is a visualisation, not a diagnosis — the clinic team confirms in consultation.)
  */
 export function useFaceMesh() {
   const [ready] = useState(true);

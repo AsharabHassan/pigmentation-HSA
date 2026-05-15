@@ -13,18 +13,30 @@ export interface Testimonial {
   afterSrc: string;
 }
 
-export function Testimonials({ items }: { items: Testimonial[] }) {
+export interface TestimonialsProps {
+  items: Testimonial[];
+  sectionKicker?: string;
+  headlineMain?: string;
+  headlineAccent?: string;
+}
+
+export function Testimonials({
+  items,
+  sectionKicker = "Real patients, Glasgow",
+  headlineMain = "You've heard our promise.",
+  headlineAccent = "Here's what they say.",
+}: TestimonialsProps) {
   return (
     <section className="bg-surface-50 py-20 md:py-28">
       <Container width="wide">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 md:mb-16">
           <div>
             <p className="text-[11px] uppercase tracking-[0.18em] text-clay-500 font-semibold mb-3">
-              Real patients, Glasgow
+              {sectionKicker}
             </p>
             <h2 className="font-display text-4xl md:text-6xl text-ink-900 leading-[1.05] max-w-3xl">
-              You&apos;ve heard our promise.<br />
-              Here&apos;s what they say.
+              {headlineMain}<br />
+              {headlineAccent}
             </h2>
           </div>
         </div>

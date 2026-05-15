@@ -61,7 +61,37 @@ export interface SkinAnalysis {
   analyzed_by: "claude" | "fallback";
 }
 
-const SYSTEM_PROMPT = `You are a clinical aesthetics analyst at Harley Street Aesthetics in Glasgow.
+export type Treatment = "pigmentation" | "chemical-peel" | "skin-glow-drip";
+
+const TREATMENT_CONTEXT: Record<Treatment, string> = {
+  pigmentation: `\n\nTREATMENT CONTEXT (very important)
+The patient is viewing the PIGMENTATION landing page. Recommended protocols MUST come from this list — do not invent or suggest treatments outside it:
+- "Signature 3-Step Pigmentation Protocol" — primary recommendation for melasma, mixed dermal pigmentation, moderate-severe cases
+- "PicoSure Targeted" — for discrete sun spots, age spots, post-acne marks on lighter skin
+- "Lip Neutralisation Protocol" — when dominant_concern is lip-pigment
+- "Post-Acne Clarity Protocol" — when dominant_concern is post-acne
+- "Clarity Peel + Mesotherapy" — for diffuse uneven tone, mild surface cases, Fitzpatrick IV–VI maintenance
+- "Consultation Required" — when confidence is low or image is unclear
+For estimated_sessions, use ranges like "4–6 sessions at 3-week intervals over 12 weeks". Extend to "5–6 over 14 weeks" for Fitzpatrick V/VI.`,
+  "chemical-peel": `\n\nTREATMENT CONTEXT (very important)
+The patient is viewing the CHEMICAL PEEL landing page. Recommended protocols MUST come from this list — do not suggest lasers, drips, or off-menu items:
+- "Glow Peel — single or course of 4" — for dullness, pre-event radiance, sensitive skin, prep before laser
+- "Clarity Peel — course of 4" — for uneven tone, mild PIH, enlarged pores, oily skin, active acne, Fitzpatrick IV–VI
+- "Renewal Peel — course of 4" — for fine lines, deeper post-acne marks, sun damage, mature texture
+- "Signature Peel — custom multi-acid + mesotherapy" — for stubborn melasma, deeper scarring, dramatic reset (premium tier)
+- "Consultation Required" — when confidence is low
+For estimated_sessions, use peel cadences: "single peel + maintenance" or "course of 4 at 3-week intervals over 12 weeks". Never recommend laser or IV drip protocols from this page.`,
+  "skin-glow-drip": `\n\nTREATMENT CONTEXT (very important)
+The patient is viewing the SKIN GLOW IV DRIP landing page. Recommended protocols MUST come from this list — do not suggest peels, lasers, or off-menu items:
+- "Skin Glow Drip — course of 6" — primary recommendation for dullness, uneven tone, post-acne marks, sun damage, oxidative stress
+- "Enhanced Glow Drip — course of 6" — premium tier for stubborn melasma, deeper pigmentation, mature skin
+- "Glutathione Shot — monthly" — for maintenance after a course or pre-event boost (single touch-ups)
+- "Vitamin C 25g IV — course of 6" — for collagen support, fine lines, post-illness recovery, immune + glow combination
+- "Consultation Required" — when confidence is low
+For estimated_sessions, use drip cadences: "course of 6 over 6 weeks", "monthly maintenance after course", or "single drip 7–10 days pre-event". Never recommend laser or peel protocols from this page.`,
+};
+
+const SYSTEM_PROMPT_BASE = `You are a clinical aesthetics analyst at Harley Street Aesthetics in Glasgow.
 You are reviewing a patient-submitted selfie to produce a non-diagnostic visual analysis for the clinic's pigmentation landing page.
 
 Your job is to call the analyze_skin tool with structured findings — never respond in plain text.
@@ -172,6 +202,7 @@ const TOOL_SCHEMA = {
 export async function analyzeSkin(input: {
   imageBase64: string;
   mediaType: "image/jpeg" | "image/png" | "image/webp";
+  treatment?: Treatment;
 }): Promise<SkinAnalysis | null> {
   if (!process.env.ANTHROPIC_API_KEY) {
     return null;
@@ -180,16 +211,16 @@ export async function analyzeSkin(input: {
   const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic();
 
-  // Note: adaptive thinking is incompatible with forced tool_choice on Opus 4.7
-  // (400: "Thinking may not be enabled when tool_choice forces tool use").
-  // The vision task is structured enough not to need it.
+  const treatment = input.treatment ?? "pigmentation";
+  const systemPrompt = SYSTEM_PROMPT_BASE + TREATMENT_CONTEXT[treatment];
+
   const response = await client.messages.create({
     model: "claude-opus-4-7",
     max_tokens: 4096,
     system: [
       {
         type: "text",
-        text: SYSTEM_PROMPT,
+        text: systemPrompt,
         cache_control: { type: "ephemeral" },
       },
     ],

@@ -3,7 +3,8 @@ import { normalizePhone } from "@lib/validation/phone";
 import { hasMxRecord } from "@lib/validation/email-mx";
 import { scoreLead, leadTag } from "@lib/lead-scoring/score";
 import { buildGhlContact } from "@lib/ghl/payload";
-import { ghlUpsertContact } from "@lib/ghl/client";
+import { ghlSubmitWebhook } from "@lib/ghl/client";
+import { GHL_WEBHOOKS, type ClinicLocation, type CampaignType } from "@lib/ghl/webhooks";
 import type { CountryCode } from "libphonenumber-js";
 
 export const runtime = "edge";
@@ -43,9 +44,13 @@ export async function POST(req: Request): Promise<Response> {
 
   const country = ((raw.phoneCountry as string) || "GB") as CountryCode;
   const phoneE164 = typeof raw.rawPhone === "string" ? normalizePhone(raw.rawPhone, country) : null;
-  if (!phoneE164) return json(400, { ok: false, fieldErrors: { phone: "Enter a valid mobile number" } });
+  if (!phoneE164) {
+    console.warn("[lead/submit] 400 phone:", { rawPhone: raw.rawPhone, country });
+    return json(400, { ok: false, fieldErrors: { phone: "Enter a valid mobile number" } });
+  }
 
   if (typeof raw.email === "string" && !(await hasMxRecord(raw.email))) {
+    console.warn("[lead/submit] 400 email:", { email: raw.email });
     return json(400, { ok: false, fieldErrors: { email: "This email domain doesn't accept mail" } });
   }
 
@@ -58,6 +63,7 @@ export async function POST(req: Request): Promise<Response> {
   if (!parsed.success) {
     const fieldErrors: Record<string, string> = {};
     for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] = issue.message;
+    console.warn("[lead/submit] 400 zod:", JSON.stringify(parsed.error.issues, null, 2));
     return json(400, { ok: false, fieldErrors });
   }
 
@@ -66,16 +72,35 @@ export async function POST(req: Request): Promise<Response> {
   const tag = leadTag(score);
   const contact = buildGhlContact(lead, "Pigmentation LP — Glasgow", tag, score);
 
-  // GHL is optional in dev — if no key, log + continue so the UI flow works
+  const source = (lead.source || "").toLowerCase();
+  const location: ClinicLocation = source.includes("london") ? "london" : "glasgow";
+  
+  let campaign: CampaignType = "pigmentation";
+  if (source.includes("peel")) campaign = "chemical_peels";
+  if (source.includes("glow") || source.includes("iv") || source.includes("drip")) campaign = "skin_glow_iv";
+
+  const webhookUrl = GHL_WEBHOOKS[location][campaign];
+
+  const flatPayload = {
+    firstName: contact.firstName,
+    lastName: contact.lastName,
+    email: contact.email,
+    phone: contact.phone,
+    tags: contact.tags,
+    source: contact.source,
+    ...contact.customFields
+  };
+
+  // GHL is optional in dev — if no webhook, log + continue so the UI flow works
   let ghlOk = true;
-  if (process.env.GHL_API_KEY && process.env.GHL_LOCATION_ID) {
-    const result = await ghlUpsertContact(contact);
+  if (webhookUrl) {
+    const result = await ghlSubmitWebhook(flatPayload, webhookUrl);
     ghlOk = result.ok;
     if (!result.ok) {
-      await queueFailedLead({ contact, lead, attempts: 1, firstAttempt: Date.now() });
+      await queueFailedLead({ flatPayload, webhookUrl, attempts: 1, firstAttempt: Date.now() });
     }
   } else {
-    console.warn("[lead] GHL not configured — skipping upsert. Contact:", contact.email);
+    console.warn("[lead] No webhook configured for", location, campaign);
   }
 
   const eventId = (raw.eventId as string) ?? crypto.randomUUID();
