@@ -43,7 +43,7 @@ export function BookingSection({ calendarUrl = FALLBACK_URL }: Props) {
               that works.
             </h2>
             <p className="mt-6 text-base md:text-lg text-ink-700 max-w-md leading-relaxed">
-              Ten focused minutes with the Harley Street Medics team over video. We&apos;ll review your skin, walk you through the protocol options, and share a transparent price. No card, no pressure, no upsell.
+              Ten focused minutes with the Harley Street Aesthetics team over video. We&apos;ll review your skin, walk you through the protocol options, and share a transparent price. No card, no pressure, no upsell.
             </p>
 
             <ul className="mt-8 space-y-4 text-sm text-ink-700">
@@ -101,7 +101,7 @@ function CalendarPlaceholder() {
         Set <code className="bg-surface-200 px-2 py-0.5 rounded text-[12px] font-mono">NEXT_PUBLIC_GHL_CALENDAR_URL</code> in your env to your GHL booking widget URL.
       </p>
       <a
-        href="mailto:bookings@harleystreetmedics.clinic?subject=Consultation%20Request"
+        href="mailto:hello@harleystreetaesthetic.co.uk?subject=Consultation%20Request"
         className="mt-8 inline-flex items-center bg-clay-500 text-ink-900 px-6 py-3
                    text-[12px] uppercase tracking-[0.12em] font-semibold rounded-full
                    hover:bg-clay-600 transition-colors"

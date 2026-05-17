@@ -13,7 +13,7 @@ interface Props {
  * Server-rendered (no client state) so it shows on first paint.
  */
 export function AnnouncementRibbon({
-  message = "Free 10-minute online consultation with the Harley Street Medics team",
+  message = "Free 10-minute online consultation with the Harley Street Aesthetics team",
   ctaLabel = "Book now",
   ctaHref = "#book",
 }: Props = {}) {

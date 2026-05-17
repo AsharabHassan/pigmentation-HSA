@@ -8,7 +8,7 @@ export const testimonialsGlasgow: Testimonial[] = [
     afterSrc:  "/images/testimonials/aisha-after.png",
   },
   {
-    firstName: "Chris", city: "Glasgow", stars: 5,
+    firstName: "Naomi", city: "Glasgow", stars: 5,
     quote: "Sun-damage spots on my cheeks that I'd been told were just permanent. Faded over three sessions. The whole team made it feel like proper medicine — not a beauty appointment.",
     beforeSrc: "/images/testimonials/chris-before.png",
     afterSrc:  "/images/testimonials/chris-after.png",
@@ -22,20 +22,20 @@ export const testimonialsGlasgow: Testimonial[] = [
   {
     firstName: "Yusuf", city: "Glasgow", stars: 5,
     quote: "I'm Fitzpatrick V and most clinics either refused to treat me or used something too aggressive last time and left a worse mark. Here the protocol was actually calibrated to my skin type. Visible difference by session two with zero burning.",
-    beforeSrc: "/images/testimonials/anika-before.png",
-    afterSrc:  "/images/testimonials/anika-after.png",
-  },
-  {
-    firstName: "Eilidh", city: "Stirling", stars: 5,
-    quote: "Pregnancy left me with melasma that no over-the-counter cream touched. Started treatment six months after the baby and by month three my forehead was clear. Felt looked-after through the whole protocol.",
     beforeSrc: "/images/testimonials/mehmet-before.png",
     afterSrc:  "/images/testimonials/mehmet-after.png",
   },
   {
-    firstName: "Ravi", city: "Glasgow", stars: 5,
-    quote: "Chest pigmentation from years on a building site — everywhere else just wanted to laser my face. Here they took the chest seriously, mapped the whole area, and four sessions later the difference is the kind I actually wanted to show people.",
-    beforeSrc: "/images/testimonials/yasmin-before.png",
-    afterSrc:  "/images/testimonials/yasmin-after.png",
+    firstName: "Eilidh", city: "Stirling", stars: 5,
+    quote: "Pregnancy left me with melasma that no over-the-counter cream touched. Started treatment six months after the baby and by month three my forehead was clear. Felt looked-after through the whole protocol.",
+    beforeSrc: "/images/testimonials/anika-before.png",
+    afterSrc:  "/images/testimonials/anika-after.png",
+  },
+  {
+    firstName: "Scott", city: "Glasgow", stars: 5,
+    quote: "Sun damage across my cheeks from years working outdoors — everywhere else just wanted to throw a quick laser at it. Here they actually mapped the whole pattern, calibrated the protocol to my skin, and four sessions later the difference is the kind I actually wanted to show in photos.",
+    beforeSrc: "/images/testimonials/sg-testim-5-before.webp",
+    afterSrc:  "/images/testimonials/sg-testim-5-after.webp",
   },
 ];
 
@@ -47,8 +47,8 @@ export const testimonialsLondon: Testimonial[] = [
     afterSrc:  "/images/testimonials/aisha-after.png",
   },
   {
-    firstName: "James", city: "Wimbledon", stars: 5,
-    quote: "Sun spots from years of running outdoors. Wedding in seven months and a fiancée who'd been hinting. Three sessions and a proper SPF routine — clear by the engagement shoot. No nonsense, no upsells.",
+    firstName: "Jenna", city: "Wimbledon", stars: 5,
+    quote: "Sun spots from years of running outdoors. Wedding in seven months and a fiancé who'd been hinting. Three sessions and a proper SPF routine — clear by the engagement shoot. No nonsense, no upsells.",
     beforeSrc: "/images/testimonials/chris-before.png",
     afterSrc:  "/images/testimonials/chris-after.png",
   },

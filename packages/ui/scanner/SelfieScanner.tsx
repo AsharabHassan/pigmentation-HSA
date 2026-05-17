@@ -534,7 +534,7 @@ function LeadGateState({ analysis, leadSource, onUnlock, onReset }: {
           Where should we send it?
         </h3>
         <p className="mt-3 text-ink-700 leading-relaxed">
-          Your atlas, recommended protocol, and a link to book a free 10-minute consultation with the Harley Street Medics team.
+          Your atlas, recommended protocol, and a link to book a free 10-minute consultation with the Harley Street Aesthetics team.
         </p>
 
         {serverError && (

@@ -10,7 +10,7 @@ export function NavBar() {
     <header className="sticky top-0 z-40 bg-surface-50/85 backdrop-blur-md border-b border-surface-200">
       <Container width="wide" className="flex items-center justify-between py-4 md:py-5">
         <Link href="/" className="flex items-baseline gap-2 text-ink-900">
-          <img src="/logo.png" alt="Harley Street Aesthetics" className="h-6 md:h-8 w-auto object-contain" />
+          <img src="/logo.png" alt="Harley Street Aesthetics" className="h-14 md:h-20 w-auto object-contain" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8 text-sm text-ink-700">

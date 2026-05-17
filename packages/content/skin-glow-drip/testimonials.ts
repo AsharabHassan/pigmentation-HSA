@@ -59,16 +59,16 @@ export const testimonialsLondon: Testimonial[] = [
     afterSrc:  "/images/testimonials/mehmet-after.png",
   },
   {
-    firstName: "Ethan", city: "Greenwich", stars: 5,
+    firstName: "Emma", city: "Greenwich", stars: 5,
     quote: "First IV of any kind. The team explained every step — what's in the bag, why this dose, what to expect over the course. By drip three I noticed my skin was clearer first thing in the morning. The bedside manner is what brought me back for the second course.",
-    beforeSrc: "/images/testimonials/sg-testim-4-before.jpg",
-    afterSrc:  "/images/testimonials/sg-testim-4-after.jpg",
+    beforeSrc: "/images/testimonials/chris-before.png",
+    afterSrc:  "/images/testimonials/chris-after.png",
   },
   {
     firstName: "Priya", city: "Wimbledon", stars: 5,
     quote: "Combined the drip course with two Clarity peels. The combination made a real difference to the post-acne marks I'd lived with since uni. Twelve weeks in and my skin looks like an even baseline for the first time.",
-    beforeSrc: "/images/testimonials/sg-testim-5-before.webp",
-    afterSrc:  "/images/testimonials/sg-testim-5-after.webp",
+    beforeSrc: "/images/testimonials/sg-testim-4-before.jpg",
+    afterSrc:  "/images/testimonials/sg-testim-4-after.jpg",
   },
   {
     firstName: "Maya", city: "Canary Wharf", stars: 5,

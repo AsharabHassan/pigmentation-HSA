@@ -6,8 +6,10 @@ import { DoctorSection } from "@ui/sections/DoctorSection";
 import { Testimonials } from "@ui/sections/Testimonials";
 import { PricingCards } from "@ui/sections/PricingCards";
 import { FinancingSection } from "@ui/sections/FinancingSection";
+import { ClinicSection } from "@ui/sections/ClinicSection";
 import { FAQ } from "@ui/sections/FAQ";
 
+import { clinics } from "@content/clinics";
 import { hero } from "@content/chemical-peel/hero";
 import { team } from "@content/chemical-peel/doctor";
 import { testimonialsGlasgow as testimonials } from "@content/chemical-peel/testimonials";
@@ -76,6 +78,7 @@ export default function ChemicalPeelLpPage() {
         entries={faqOnPage}
         id="faq"
       />
+      <ClinicSection clinic={clinics.glasgow} />
     </>
   );
 }

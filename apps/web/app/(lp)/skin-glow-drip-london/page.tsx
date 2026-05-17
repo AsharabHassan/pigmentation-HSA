@@ -6,8 +6,10 @@ import { DoctorSection } from "@ui/sections/DoctorSection";
 import { Testimonials } from "@ui/sections/Testimonials";
 import { PricingCards } from "@ui/sections/PricingCards";
 import { FinancingSection } from "@ui/sections/FinancingSection";
+import { ClinicSection } from "@ui/sections/ClinicSection";
 import { FAQ } from "@ui/sections/FAQ";
 
+import { clinics } from "@content/clinics";
 import { hero } from "@content/skin-glow-drip/hero";
 import { team } from "@content/skin-glow-drip/doctor";
 import { testimonialsLondon as testimonials } from "@content/skin-glow-drip/testimonials";
@@ -76,6 +78,7 @@ export default function SkinGlowDripLondonLpPage() {
         entries={faqOnPage}
         id="faq"
       />
+      <ClinicSection clinic={clinics.london} />
     </>
   );
 }
